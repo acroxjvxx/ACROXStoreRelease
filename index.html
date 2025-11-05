@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACROX Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{
+  font-family:'Roboto',sans-serif;background:#111;color:#eee;
+  min-height:100vh;position:relative;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+  opacity:0.2;z-index:0;filter:brightness(0.3) grayscale(0.3);
+  pointer-events: none;
+}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;background:rgba(0,0,0,0.85);
+  position:fixed;width:100%;top:0;z-index:10;backdrop-filter:blur(6px);
+}
+header h1{color:#9b59b6;font-size:28px;cursor:pointer;transition:0.3s;}
+header h1:hover{color:#b278e5;}
+#categories-menu{
+  position:relative;
+}
+#categories-menu button{
+  background:#0af;color:#111;padding:6px 10px;border:none;border-radius:6px;
+  cursor:pointer;transition:0.2s;
+}
+#categories-menu button:hover{background:#08d;}
+#categories-menu .dropdown{
+  display:none;
+  position:absolute;
+  top:35px;
+  left:0;
+  background:#1e1e1e;
+  border-radius:6px;
+  overflow:hidden;
+  min-width:120px;
+  z-index:20;
+}
+#categories-menu .dropdown div{
+  padding:6px 10px;
+  cursor:pointer;
+}
+#categories-menu .dropdown div:hover{background:#2a2a2a;}
+header .search-bar{width:250px;position:relative;}
+header .search-bar input{
+  width:100%;padding:6px 10px;border-radius:4px;border:none;
+  font-size:13px;background:#1e1e1e;color:#eee;
+}
+#badge{
+  background:#9b59b6;color:#111;width:40px;height:40px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:18px;cursor:pointer;transition:0.3s;
+}
+#badge:hover{transform:scale(1.1);}
+main{
+  padding-top:120px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  max-width:1000px;
+  margin:0 auto;
+}
+.store-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  width:100%;
+}
+.game-card{
+  width:200px;
+  background:rgba(0,0,0,0.85);
+  border-radius:8px;
+  padding:10px;
+  text-align:left;
+  color:#eee;
+  transition:0.3s;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  min-height:370px;
+}
+.game-card img{
+  width:100%;
+  height:auto;
+  border-radius:4px;
+  margin-bottom:8px;
+}
+.game-card h3{
+  font-size:18px;
+  margin-bottom:6px;
+  color:#9b59b6;
+}
+.game-card .categories{
+  display:flex;
+  flex-wrap:wrap;
+  margin-bottom:6px;
+}
+.game-card .categories span{
+  font-size:12px;
+  background:#0af;
+  color:#111;
+  padding:2px 6px;
+  border-radius:4px;
+  margin-right:4px;
+  margin-bottom:4px;
+}
+.game-card .description{
+  flex-grow:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+.game-card p{
+  font-size:12px;
+  color:#ccc;
+  margin-bottom:4px;
+}
+.game-card .button{
+  display:block;
+  width:100%;
+  text-align:center;
+  padding:6px 0;
+  background:#0af;
+  color:#111;
+  font-weight:600;
+  border-radius:6px;
+  text-decoration:none;
+  transition:0.3s;
+  margin-top:8px;
+}
+.game-card .button:hover{background:#08d;}
+#search-results{
+  position:absolute;
+  top:32px;
+  left:0;
+  width:100%;
+  background:#1e1e1e;
+  border-radius:4px;
+  max-height:200px;
+  overflow-y:auto;
+  display:none;
+  z-index:15;
+}
+#search-results div{
+  padding:6px 10px;
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  transition:0.2s;
+}
+#search-results div:hover{background:#2a2a2a;}
+#search-results img{
+  width:30px;
+  height:30px;
+  object-fit:cover;
+  border-radius:4px;
+  margin-right:8px;
+}
+#no-results-box{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.9);
+  padding:20px 30px;
+  border-radius:10px;
+  text-align:center;
+  color:#eee;
+  font-size:16px;
+  z-index:50;
+}
+#no-results-box a{
+  color:#0af;
+  text-decoration:none;
+}
+#no-results-box a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <h1 id="logo">ACROX</h1>
+    <div id="categories-menu">
+      <button id="categoriesBtn">Categorie ▾</button>
+      <div class="dropdown" id="categoriesDropdown">
+        <div data-category="Horror">Horror</div>
+        <div data-category="Adventure">Adventure</div>
+        <div data-category="Action">Action</div>
+        <div data-category="All">Tutti</div>
+      </div>
+    </div>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Cerca giochi..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="badge">A</div>
+</header>
+
+<main>
+  <div class="store-container" id="store">
+
+    <!-- BodyRecords -->
+    <div class="game-card" data-categories="Horror">
+      <img src="bodyrecords.jpg" alt="BodyRecords">
+      <h3>BodyRecords</h3>
+      <div class="categories"><span>Horror</span></div>
+      <div class="description">
+        <p>Gioco horror con ambientazioni mozzafiato.</p>
+        <p>Sito ancora in elaborazione.</p>
+        <p>Password: <strong>acroxsite</strong></p>
+      </div>
+      <a class="button" href="BodyRecords.html">Vai al gioco</a>
+    </div>
+
+    <!-- Lethal Company -->
+    <div class="game-card" data-categories="Horror,Action">
+      <img src="lethalcompany.jpg" alt="Lethal Company">
+      <h3>Lethal Company</h3>
+      <div class="categories"><span>Horror</span><span>Action</span></div>
+      <div class="description">
+        <p>Gioco cooperativo dove i giocatori devono sopravvivere insieme a trappole e pericoli mortali.</p>
+        <p>Collaborate per risolvere enigmi e sopravvivere.</p>
+        <p>Atmosfera intensa e piena di suspense.</p>
+      </div>
+      <a class="button" href="Lethal Company.html">Vai al gioco</a>
+    </div>
+
+    <!-- Macabre -->
+    <div class="game-card" data-categories="Horror">
+      <img src="macabre.jpg" alt="Macabre">
+      <h3>Macabre</h3>
+      <div class="categories"><span>Horror</span></div>
+      <div class="description">
+        <p>Gioco horror con atmosfera cupa e enigmi spaventosi.</p>
+        <p>Esplora ambienti inquietanti e scopri segreti nascosti.</p>
+        <p>Affronta sfide e sopravvivi a situazioni terrificanti.</p>
+      </div>
+      <a class="button" href="Macabre.html">Vai al gioco</a>
+    </div>
+
+    <!-- Ready or Not -->
+    <div class="game-card" data-categories="Action,Adventure">
+      <img src="readyornot.jpg" alt="Ready or Not">
+      <h3>Ready or Not</h3>
+      <div class="categories"><span>Action</span><span>Adventure</span></div>
+      <div class="description">
+        <p>Gioco tattico cooperativo dove la strategia è fondamentale.</p>
+        <p>Affronta missioni intense con la tua squadra.</p>
+        <p>Preparati a sfide realistiche e ad azione frenetica.</p>
+      </div>
+      <a class="button" href="ReadyOrNot.html">Vai al gioco</a>
+    </div>
+
+    <!-- BodyCam -->
+    <div class="game-card" data-categories="Action,Adventure">
+      <img src="bodycam.jpg" alt="BodyCam">
+      <h3>BodyCam</h3>
+      <div class="categories"><span>Action</span><span>Adventure</span></div>
+      <div class="description">
+        <p>Gioco emozionante con elementi horror e azione intensa.</p>
+        <p>Preparati a sfide sorprendenti e suspense continua.</p>
+      </div>
+      <a class="button" href="BodyCam.html">Vai al gioco</a>
+    </div>
+
+  </div>
+</main>
+
+<div id="no-results-box">
+  Gioco non trovato o in arrivo. Per info: <a href="https://discord.gg/S6NguTC342" target="_blank">Discord</a>
+</div>
+
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_938bde2e4b.mp3?filename=ambient-piano-ambient-music-11157.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// Badge
+const userName = localStorage.getItem("userName") || "A";
+document.getElementById("badge").textContent = userName.charAt(0).toUpperCase();
+document.getElementById("logo").addEventListener("click", ()=>{window.location.reload();});
+
+// Dropdown categorie
+const categoriesBtn = document.getElementById('categoriesBtn');
+const categoriesDropdown = document.getElementById('categoriesDropdown');
+categoriesBtn.addEventListener('click', ()=>{categoriesDropdown.style.display = categoriesDropdown.style.display==='block' ? 'none' : 'block';});
+window.addEventListener('click', e=>{if(!categoriesDropdown.contains(e.target) && e.target!==categoriesBtn){categoriesDropdown.style.display='none';}});
+
+// Filtra giochi per categoria
+const store = document.getElementById('store');
+const noResultsBox = document.getElementById('no-results-box');
+document.querySelectorAll('#categoriesDropdown div').forEach(cat=>{
+  cat.addEventListener('click', ()=>{
+    const selected = cat.dataset.category;
+    const cards = store.querySelectorAll('.game-card');
+    let anyVisible = false;
+    cards.forEach(card=>{
+      const cats = card.dataset.categories.split(',');
+      card.style.display = (selected==='All' || cats.includes(selected)) ? 'flex' : 'none';
+      if(card.style.display==='flex') anyVisible=true;
+    });
+    noResultsBox.style.display = anyVisible ? 'none' : 'block';
+    categoriesDropdown.style.display='none';
+  });
+});
+
+// Barra di ricerca
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+const games = [
+  {name:"BodyRecords", img:"bodyrecords.jpg", link:"BodyRecords.html"},
+  {name:"Lethal Company", img:"lethalcompany.jpg", link:"Lethal Company.html"},
+  {name:"Macabre", img:"macabre.jpg", link:"Macabre.html"},
+  {name:"Ready or Not", img:"readyornot.jpg", link:"ReadyOrNot.html"},
+  {name:"BodyCam", img:"bodycam.jpg", link:"BodyCam.html"}
+];
+
+function filterGames(query){
+  let anyVisible = false;
+  store.querySelectorAll('.game-card').forEach(card=>{
+    const name = card.querySelector('h3').textContent.toLowerCase();
+    card.style.display = name.startsWith(query) ? 'flex' : 'none';
+    if(card.style.display==='flex') anyVisible=true;
+  });
+  noResultsBox.style.display = anyVisible ? 'none' : 'block';
+}
+
+searchInput.addEventListener('input',()=>{
+  const val = searchInput.value.toLowerCase();
+  searchResults.innerHTML='';
+  if(val===''){searchResults.style.display='none'; return;}
+  const filtered = games.filter(g=>g.name.toLowerCase().startsWith(val));
+  filtered.forEach(g=>{
+    const div = document.createElement('div');
+    div.innerHTML=`<img src="${g.img}" alt="${g.name}"><span>${g.name}</span>`;
+    div.addEventListener('click',()=>{location.href=g.link; searchResults.style.display='none';});
+    searchResults.appendChild(div);
+  });
+  searchResults.style.display = filtered.length ? 'block' : 'none';
+});
+
+searchInput.addEventListener('keydown', e=>{
+  if(e.key==='Enter'){
+    const game = games.find(g=>g.name.toLowerCase()===searchInput.value.toLowerCase());
+    if(game) location.href=game.link;
+    else location.href='index.html';
+    searchResults.style.display='none';
+  }
+});
+
+document.addEventListener('click', e=>{
+  if(!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.style.display='none';
+});
+</script>
+
+</body>
+</html>

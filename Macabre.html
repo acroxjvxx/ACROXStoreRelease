@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Macabre - ACROX Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Creepster&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{font-family:'Roboto',sans-serif;background:#111;color:#eee;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;opacity:0.2;z-index:0;filter:brightness(0.3) grayscale(0.3);pointer-events:none;}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(0,0,0,0.85);position:fixed;width:100%;top:0;z-index:10;backdrop-filter:blur(6px);}
+header h1{color:#9b59b6;font-size:28px;cursor:pointer;transition:0.3s;}
+header h1:hover{color:#b278e5;}
+header .search-bar{width:250px;position:relative;}
+header .search-bar input{width:100%;padding:6px 10px;border-radius:4px;border:none;font-size:13px;background:#1e1e1e;color:#eee;}
+#badge{background:#9b59b6;color:#111;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;cursor:pointer;transition:0.3s;}
+#badge:hover{transform:scale(1.1);}
+main{padding-top:120px;display:flex;justify-content:center;gap:40px;max-width:1200px;margin:0 auto;flex-wrap:wrap;}
+.left-panel{flex:2;min-width:300px;position:relative;}
+.left-panel h2{color:#9b59b6;margin-bottom:15px;font-size:24px;text-align:left;}
+.video-container{position:relative;width:100%;padding-bottom:45%;border-radius:8px;overflow:hidden;background:#000;}
+.video-container video,.video-container img{position:absolute;width:100%;height:100%;border:none;border-radius:8px;object-fit:cover;cursor:pointer;}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);font-size:30px;color:rgba(255,255,255,0.7);cursor:pointer;user-select:none;background:rgba(0,0,0,0.3);padding:6px;border-radius:50%;z-index:5;}
+.arrow:hover{color:#0af;background:rgba(0,0,0,0.5);}
+.arrow-left{left:5px;}
+.arrow-right{right:5px;}
+#audio-button{position:absolute;bottom:10px;right:10px;font-size:24px;background:rgba(0,0,0,0.4);padding:6px;border-radius:50%;cursor:pointer;z-index:6;display:flex;align-items:center;justify-content:center;}
+#progress-container{position:absolute;bottom:3px;left:3px;width:calc(100%-6px);height:4px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;}
+#progress-bar{width:0%;height:100%;background:#0af;}
+.video-divider{width:100%;height:2px;background:rgba(255,255,255,0.2);margin:15px 0;border-radius:1px;}
+.system-requirements h3{color:#9b59b6;margin-bottom:10px;}
+.system-requirements ul{margin-left:20px;margin-bottom:10px;list-style:disc;}
+.system-requirements li{line-height:1.5;font-size:14px;}
+.right-panel{flex:1;min-width:300px;background:rgba(0,0,0,0.85);border-radius:10px;padding:20px;display:flex;flex-direction:column;justify-content:flex-start;align-self:flex-start;}
+.right-panel .info-section{margin-bottom:15px;}
+.right-panel .info-section p, .right-panel .info-section ul{margin-left:0;margin-bottom:8px;line-height:1.5;}
+.right-panel .info-section ul{list-style:disc;margin-left:20px;}
+.right-panel .button{display:inline-block;padding:12px 20px;background:#0af;color:#111;border-radius:6px;font-weight:700;text-decoration:none;text-align:center;margin-top:auto;width:100%;transition:0.3s;}
+.right-panel .button:hover{background:#08d;}
+#search-results{position:absolute;top:32px;left:0;width:100%;background:#1e1e1e;border-radius:4px;max-height:200px;overflow-y:auto;display:none;z-index:15;}
+#search-results div{padding:6px 10px;display:flex;align-items:center;cursor:pointer;transition:0.2s;}
+#search-results div:hover{background:#2a2a2a;}
+#search-results img{width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:8px;}
+#footer-credit{position:fixed;bottom:5px;right:10px;color:#9b59b6;font-family:'Creepster', cursive;font-size:16px;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="logo" onclick="location.href='index.html'">ACROX</h1>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Cerca giochi..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="badge">A</div>
+</header>
+
+<main>
+  <div class="left-panel">
+    <h2>Macabre</h2>
+    <div class="video-container" id="media-container">
+      <div class="arrow arrow-left">&#10094;</div>
+      <div class="arrow arrow-right">&#10095;</div>
+      <video id="main-video" autoplay loop muted></video>
+      <div id="audio-button">🔈</div>
+      <div id="progress-container"><div id="progress-bar"></div></div>
+    </div>
+
+    <div class="video-divider"></div>
+
+    <div class="system-requirements">
+      <h3>Requisiti di sistema</h3>
+      <strong>Minimi:</strong>
+      <ul>
+        <li>Windows 10 a 64 bit</li>
+        <li>Intel i5-7400 o equivalente</li>
+        <li>8 GB RAM</li>
+        <li>NVIDIA GTX 1060 / AMD equivalente</li>
+        <li>DirectX 11</li>
+        <li>10 GB spazio disponibile</li>
+      </ul>
+      <strong>Consigliati:</strong>
+      <ul>
+        <li>Windows 10/11 a 64 bit</li>
+        <li>Intel i7-9700 o equivalente</li>
+        <li>16 GB RAM</li>
+        <li>NVIDIA RTX 3070 / AMD equivalente</li>
+        <li>DirectX 12</li>
+        <li>10 GB spazio disponibile</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="info-section">
+      <p><strong>Titolo:</strong> Macabre</p>
+      <p><strong>Genere:</strong> Horror, Adventure, Indie</p>
+      <p><strong>Sviluppatore:</strong> IndieDev Team</p>
+      <p><strong>Editore:</strong> IndieDev Team</p>
+      <p><strong>Data di rilascio:</strong> 10 giu 2025</p>
+    </div>
+    <div class="info-section">
+      <p>Un'avventura horror intensa con enigmi e atmosfere inquietanti.</p>
+      <p>Esplora ambienti misteriosi e affronta sfide pericolose per sopravvivere.</p>
+    </div>
+    <div class="info-section">
+      <p><strong>Caratteristiche principali:</strong></p>
+      <ul>
+        <li>Esperienza horror immersiva</li>
+        <li>Atmosfere cupe e inquietanti</li>
+      </ul>
+    </div>
+    <a class="button" href="https://online-fix.me/games/adventures/17896-macabre-po-seti.html" target="_blank" rel="noopener noreferrer">Download</a>
+  </div>
+</main>
+
+<div id="footer-credit">by acrox</div>
+
+<script>
+const mediaList = [
+  {type:"video", src:"Macabre - Official Launch Trailer.mp4"},
+  {type:"img", src:"macabre1.jpg"},
+  {type:"img", src:"macabre2.jpg"},
+  {type:"img", src:"macabre3.jpg"},
+  {type:"img", src:"macabre4.jpg"},
+  {type:"img", src:"macabre5.jpg"}
+];
+
+let currentIndex = 0;
+const container = document.getElementById('media-container');
+const video = document.getElementById('main-video');
+const progressBar = document.getElementById('progress-bar');
+const audioBtn = document.getElementById('audio-button');
+
+function showMedia(index){
+  const media = mediaList[index];
+  if(media.type==="video"){
+    video.src = media.src;
+    video.style.display="block";
+    video.play();
+    audioBtn.style.display="flex";
+  } else {
+    video.style.display="none";
+    audioBtn.style.display="none";
+    if(container.querySelector('#main-img')) container.querySelector('#main-img').remove();
+    const img = document.createElement('img');
+    img.id="main-img";
+    img.src=media.src;
+    img.style.position="absolute"; img.style.width="100%"; img.style.height="100%"; img.style.objectFit="cover";
+    container.insertBefore(img, container.querySelector('.arrow-left'));
+  }
+  progressBar.style.width="0%";
+}
+showMedia(currentIndex);
+
+document.querySelector('.arrow-left').addEventListener('click', ()=>{
+  currentIndex=(currentIndex-1+mediaList.length)%mediaList.length;
+  showMedia(currentIndex);
+});
+document.querySelector('.arrow-right').addEventListener('click', ()=>{
+  currentIndex=(currentIndex+1)%mediaList.length;
+  showMedia(currentIndex);
+});
+
+video.addEventListener('click', ()=>{
+  if(video.paused) video.play();
+  else video.pause();
+});
+
+audioBtn.addEventListener('click', ()=>{
+  if(currentIndex===0){
+    video.muted = !video.muted;
+  }
+});
+
+video.addEventListener('timeupdate', ()=>{
+  if(currentIndex===0) progressBar.style.width=(video.currentTime/video.duration*100)+'%';
+});
+
+// Barra di ricerca
+const searchInput=document.getElementById('search');
+const searchResults=document.getElementById('search-results');
+const games=[
+  {name:"BodyRecords",img:"bodyrecords.jpg",link:"BodyRecords.html"},
+  {name:"Lethal Company",img:"lethalcompany.jpg",link:"Lethal Company.html"},
+  {name:"Macabre",img:"macabre.jpg",link:"Macabre.html"}
+];
+
+searchInput.addEventListener('input',()=>{
+  const val=searchInput.value.toLowerCase();
+  searchResults.innerHTML='';
+  if(val===''){searchResults.style.display='none'; return;}
+  const filtered=games.filter(g=>g.name.toLowerCase().startsWith(val));
+  filtered.forEach(g=>{
+    const div=document.createElement('div');
+    div.innerHTML=`<img src="${g.img}" alt="${g.name}"><span>${g.name}</span>`;
+    div.addEventListener('click',()=>{location.href=g.link; searchResults.style.display='none';});
+    searchResults.appendChild(div);
+  });
+  searchResults.style.display = filtered.length?'block':'none';
+});
+
+searchInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const game=games.find(g=>g.name.toLowerCase()===searchInput.value.toLowerCase());
+    if(game) location.href=game.link;
+    else location.href='index.html';
+    searchResults.style.display='none';
+  }
+});
+
+document.addEventListener('click',e=>{
+  if(!searchInput.contains(e.target)&&!searchResults.contains(e.target)) searchResults.style.display='none';
+});
+</script>
+
+</body>
+</html>

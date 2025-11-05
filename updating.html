@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aggiornamento in corso...</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Roboto',sans-serif;}
+body{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+  color:#eee;
+  position:relative;
+  overflow:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+  opacity:0.15;
+  z-index:0;
+  filter:brightness(0.3) grayscale(0.2);
+}
+.card{
+  position:relative;
+  z-index:1;
+  background:rgba(0,0,0,0.85);
+  padding:40px;
+  border-radius:12px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  text-align:center;
+  width:320px;
+}
+h2{
+  font-size:24px;
+  margin-bottom:20px;
+  color:#0af;
+}
+.loader {
+  width:100%;
+  height:12px;
+  background:#333;
+  border-radius:6px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.loader-inner {
+  height:100%;
+  width:0%;
+  background:#0af;
+  border-radius:6px;
+  transition: width 0.2s ease;
+}
+.percent{
+  margin-top:10px;
+  font-size:16px;
+  color:#ccc;
+  font-weight:700;
+  letter-spacing:1px;
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from {opacity:0;}
+  to {opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Aggiornamento in corso...</h2>
+  <div class="loader">
+    <div class="loader-inner" id="loader-inner"></div>
+  </div>
+  <div class="percent" id="percent">0%</div>
+</div>
+
+<script>
+const { ipcRenderer } = require('electron');
+const loader = document.getElementById('loader-inner');
+const percentText = document.getElementById('percent');
+
+// Aggiornamento reale della barra e dei numeri
+ipcRenderer.on('download-progress', (event, progress) => {
+  const percent = Math.floor(progress);
+  loader.style.width = percent + '%';
+  percentText.textContent = percent + '%';
+});
+</script>
+
+</body>
+</html>

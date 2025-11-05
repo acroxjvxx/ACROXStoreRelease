@@ -1,0 +1,93 @@
+﻿<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACROX — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Roboto',sans-serif;}
+body{height:100vh;display:flex;align-items:center;justify-content:center;background:#111;color:#eee;position:relative;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;opacity:0.15;z-index:0;filter:brightness(0.3) grayscale(0.2);}
+.card{position:relative;z-index:1;background:rgba(0,0,0,0.85);padding:40px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6);text-align:center;width:320px;}
+h2{font-size:28px;margin-bottom:16px;color:#0af;}
+input{width:100%;padding:12px 14px;margin-bottom:12px;border-radius:8px;border:none;font-size:14px;outline:none;background:#1e1e1e;color:#eee;}
+button{width:100%;padding:12px 14px;border:none;border-radius:8px;background:#0af;color:#111;font-weight:600;cursor:pointer;font-size:14px;transition:0.3s;}
+button:hover{background:#08d;}
+.show-toggle{display:flex;align-items:center;gap:6px;justify-content:flex-start;font-size:13px;color:#ccc;margin-bottom:12px;}
+.error{color:#ff7070;display:none;font-size:13px;margin-top:8px;}
+.version{margin-top:12px;font-size:13px;color:#aaa;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Password</h2>
+  <input type="password" id="password" placeholder="Inserisci la password">
+  <div class="show-toggle">
+    <input type="checkbox" id="showPwd"> Mostra password
+  </div>
+  <button id="pwdBtn">Entra</button>
+  <div id="error" class="error">Password errata</div>
+  <div id="version" class="version">Versione: ...</div>
+</div>
+
+<script>
+const { ipcRenderer } = require('electron');
+const fs = require('fs');
+const path = require('path');
+
+const pwdInput = document.getElementById('password');
+const pwdBtn = document.getElementById('pwdBtn');
+const error = document.getElementById('error');
+const show = document.getElementById('showPwd');
+const versionDiv = document.getElementById('version');
+
+// Legge la password dal file login.txt
+const loginFile = path.join(__dirname,'login.txt');
+let correctPassword = '';
+try {
+    correctPassword = fs.readFileSync(loginFile,'utf-8').trim();
+} catch(err) {
+    alert('Errore: login.txt non trovato!');
+}
+
+// Mostra/nascondi password
+show.addEventListener('change', ()=> {
+    pwdInput.type = show.checked ? 'text' : 'password';
+});
+
+// Funzione di login
+function tryLogin() {
+    if(pwdInput.value === correctPassword){
+        ipcRenderer.send('maximize-window');
+        window.location.href = 'index.html';
+    } else {
+        error.style.display = 'block';
+        pwdInput.value = '';
+        pwdInput.focus();
+    }
+}
+
+// Eventi login
+pwdBtn.addEventListener('click', tryLogin);
+pwdInput.addEventListener('keydown', e => {
+    if(e.key==='Enter') tryLogin();
+});
+
+// Mostra versione dal package.json
+try {
+    const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname,'package.json'),'utf-8'));
+    versionDiv.textContent = 'Versione: ' + packageJson.version;
+} catch(err) {
+    versionDiv.textContent = 'Versione non disponibile';
+}
+
+// Aggiornamento automatico gestito nel main
+ipcRenderer.on('update-available', () => {
+    window.location.href = 'updating.html';
+});
+</script>
+
+</body>
+</html>
