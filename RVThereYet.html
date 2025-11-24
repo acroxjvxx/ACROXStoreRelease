@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RV There Yet? - ACROX Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Creepster&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{
+  font-family:'Roboto',sans-serif;
+  background:#111;
+  color:#eee;
+  min-height:100vh;
+  overflow-x:hidden;
+  opacity:0;
+  transition: opacity 1.5s ease-in;
+}
+body.loaded{opacity:1;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:url('https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/ed2f7080c6622688a72a86ca85af600f2a2bdfb9.1920x1080.jpg?t=1761681404') center/cover no-repeat;
+  opacity:0.2;z-index:0;filter:brightness(0.3) grayscale(0.3);pointer-events:none;
+}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(0,0,0,0.85);position:fixed;width:100%;top:0;z-index:10;backdrop-filter:blur(6px);}
+header h1{color:#9b59b6;font-size:28px;cursor:pointer;transition:0.3s;}
+header h1:hover{color:#b278e5;}
+header .search-bar{width:250px;position:relative;}
+header .search-bar input{width:100%;padding:6px 10px;border-radius:4px;border:none;font-size:13px;background:#1e1e1e;color:#eee;}
+#badge{background:#9b59b6;color:#111;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;cursor:pointer;transition:0.3s;}
+#badge:hover{transform:scale(1.1);}
+main{padding-top:120px;display:flex;justify-content:center;gap:40px;max-width:1200px;margin:0 auto;flex-wrap:wrap;}
+.left-panel{flex:2;min-width:300px;position:relative;}
+.left-panel h2{color:#9b59b6;margin-bottom:15px;font-size:24px;text-align:left;}
+.video-container{position:relative;width:100%;padding-bottom:56%;border-radius:8px;overflow:hidden;background:#000;}
+.video-container img{position:absolute;width:100%;height:100%;border:none;border-radius:8px;object-fit:cover;cursor:pointer;}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);font-size:30px;color:rgba(255,255,255,0.7);cursor:pointer;user-select:none;background:rgba(0,0,0,0.3);padding:6px;border-radius:50%;z-index:5;}
+.arrow:hover{color:#9b59b6;background:rgba(0,0,0,0.5);}
+.arrow-left{left:5px;}
+.arrow-right{right:5px;}
+#progress-container{display:none;}
+.video-divider{width:100%;height:2px;background:rgba(255,255,255,0.2);margin:15px 0;border-radius:1px;}
+.system-requirements h3{color:#9b59b6;margin-bottom:10px;}
+.system-requirements ul{margin-left:20px;margin-bottom:10px;list-style:disc;}
+.system-requirements li{line-height:1.5;font-size:14px;}
+.right-panel{flex:1;min-width:300px;background:rgba(0,0,0,0.85);border-radius:10px;padding:20px;display:flex;flex-direction:column;justify-content:flex-start;align-self:flex-start;}
+.right-panel .info-section{margin-bottom:15px;}
+.right-panel .info-section p, .right-panel .info-section ul{margin-left:0;margin-bottom:8px;line-height:1.5;}
+.right-panel .info-section ul{list-style:disc;margin-left:20px;}
+.right-panel .button{
+  display:inline-block;
+  padding:10px 16px;
+  background:rgba(0,0,0,0.4);
+  border:2px solid #9b59b6;
+  color:#9b59b6;
+  border-radius:6px;
+  font-weight:700;
+  text-decoration:none;
+  text-align:center;
+  margin-top:8px;
+  width:auto;
+  min-width:120px;
+  transition:0.3s;
+}
+.right-panel .button:hover{
+  background:#9b59b6;
+  color:#111;
+  transform:scale(1.05);
+  box-shadow:0 0 8px #9b59b6, 0 0 15px #9b59b6;
+}
+#search-results{position:absolute;top:32px;left:0;width:100%;background:#1e1e1e;border-radius:4px;max-height:200px;overflow-y:auto;display:none;z-index:15;}
+#search-results div{padding:6px 10px;display:flex;align-items:center;cursor:pointer;transition:0.2s;}
+#search-results div:hover{background:#2a2a2a;}
+#search-results img{width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:8px;}
+#footer-credit{position:fixed;bottom:5px;right:10px;color:#9b59b6;font-family:'Creepster', cursive;font-size:16px;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="logo" onclick="location.href='index.html'">ACROX</h1>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Cerca giochi..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="badge">A</div>
+</header>
+
+<main>
+  <div class="left-panel">
+    <h2>RV There Yet?</h2>
+
+    <div class="video-container" id="media-container">
+      <div class="arrow arrow-left">&#10094;</div>
+      <div class="arrow arrow-right">&#10095;</div>
+    </div>
+
+    <div class="video-divider"></div>
+
+    <div class="system-requirements">
+      <h3>Requisiti di sistema</h3>
+      <strong>Minimi:</strong>
+      <ul>
+        <li>Windows 10 64 bit</li>
+        <li>Intel i3 / Ryzen 3</li>
+        <li>8 GB RAM</li>
+        <li>NVIDIA GTX 750 / Radeon R7 260</li>
+        <li>DirectX 11</li>
+        <li>15 GB spazio disponibile</li>
+      </ul>
+      <strong>Consigliati:</strong>
+      <ul>
+        <li>Windows 10/11 64 bit</li>
+        <li>Intel i5 / Ryzen 5</li>
+        <li>16 GB RAM</li>
+        <li>NVIDIA GTX 1060 / RTX 2060</li>
+        <li>DirectX 12</li>
+        <li>15 GB spazio disponibile</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="info-section">
+      <p><strong>Titolo:</strong> RV There Yet?</p>
+      <p><strong>Genere:</strong> Adventure / Co-op</p>
+      <p><strong>Sviluppatore:</strong> PixelFade</p>
+      <p><strong>Editore:</strong> Indie Games</p>
+      <p><strong>Data di rilascio:</strong> 2023</p>
+    </div>
+
+    <div class="info-section">
+      <p>Gioco cooperativo in cui guidi il tuo RV attraverso scenari imprevedibili, con sfide e avventure uniche per te e i tuoi amici.</p>
+    </div>
+
+    <div class="info-section">
+      <p><strong>Password per l'archivio:</strong> online-fix.me</p>
+    </div>
+
+    <a class="button" href="https://drive.usercontent.google.com/download?id=1DZJlC131Ali50DwFpLs11Eb3XxGxRChn&export=download&authuser=0" target="_blank">Download</a>
+  </div>
+</main>
+
+<div id="footer-credit">by acrox</div>
+
+<script>
+window.addEventListener('load', () => {document.body.classList.add('loaded');});
+
+const mediaList = [
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/ed2f7080c6622688a72a86ca85af600f2a2bdfb9/ss_ed2f7080c6622688a72a86ca85af600f2a2bdfb9.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/7d246f94e4ec2ff4c7be3ded82bcdd558274d7c7/ss_7d246f94e4ec2ff4c7be3ded82bcdd558274d7c7.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/f5663e0220e188d4c9db0789f0cbb4ddefd762d5/ss_f5663e0220e188d4c9db0789f0cbb4ddefd762d5.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/9face7033df9bd0274428d6215711c5dec20f245/ss_9face7033df9bd0274428d6215711c5dec20f245.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/aa6d58ff1f0eb5c5b3e6d7cc10c1576b62a745b0/ss_aa6d58ff1f0eb5c5b3e6d7cc10c1576b62a745b0.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/9c06d0d1e31ab3e05b1ce24692a9397ca7bfabf1/ss_9c06d0d1e31ab3e05b1ce24692a9397ca7bfabf1.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/e1d049defe6110250dd1e0e50cf1112ff6391381/ss_e1d049defe6110250dd1e0e50cf1112ff6391381.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/4dfb30018ca9c4994883f20aa0a6edd4a944569c/ss_4dfb30018ca9c4994883f20aa0a6edd4a944569c.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/c30eb4f8c688a46edb891ea195acb14549a09c0f/ss_c30eb4f8c688a46edb891ea195acb14549a09c0f.1920x1080.jpg?t=1761681404"},
+  {type:"img", src:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/fb646de9f84fdc610d394d78e81b4af4608c7045/ss_fb646de9f84fdc610d394d78e81b4af4608c7045.1920x1080.jpg?t=1761681404"}
+];
+
+let currentIndex = 0;
+const container = document.getElementById('media-container');
+
+function showMedia(index){
+  if(container.querySelector('#main-img')) container.querySelector('#main-img').remove();
+  const img = document.createElement('img');
+  img.id="main-img";
+  img.src=mediaList[index].src;
+  container.insertBefore(img, container.querySelector('.arrow-left'));
+}
+showMedia(currentIndex);
+
+document.querySelector('.arrow-left').addEventListener('click', ()=>{
+  currentIndex=(currentIndex-1+mediaList.length)%mediaList.length;
+  showMedia(currentIndex);
+});
+document.querySelector('.arrow-right').addEventListener('click', ()=>{
+  currentIndex=(currentIndex+1)%mediaList.length;
+  showMedia(currentIndex);
+});
+
+// Barra ricerca
+const searchInput=document.getElementById('search');
+const searchResults=document.getElementById('search-results');
+
+const games=[{name:"RV There Yet?",img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/ed2f7080c6622688a72a86ca85af600f2a2bdfb9.1920x1080.jpg?t=1761681404",link:"RVThereYet.html"}];
+
+searchInput.addEventListener('input',()=>{
+  const val=searchInput.value.toLowerCase();
+  searchResults.innerHTML='';
+  if(val===''){searchResults.style.display='none'; return;}
+  const filtered=games.filter(g=>g.name.toLowerCase().startsWith(val));
+  filtered.forEach(g=>{
+    const div=document.createElement('div');
+    div.innerHTML=`<img src="${g.img}" alt="${g.name}"><span>${g.name}</span>`;
+    div.addEventListener('click',()=>{location.href=g.link; searchResults.style.display='none';});
+    searchResults.appendChild(div);
+  });
+  searchResults.style.display = filtered.length?'block':'none';
+});
+
+document.addEventListener('click',e=>{
+  if(!searchInput.contains(e.target)&&!searchResults.contains(e.target)) searchResults.style.display='none';
+});
+</script>
+
+</body>
+</html>
