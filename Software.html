@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACROX Store - Software</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* 🎨 Personalizzazione Scrollbar principale (Verticale del Body) */
+body::-webkit-scrollbar { width: 1px; }
+body::-webkit-scrollbar-track { background: #1e1e1e; }
+body::-webkit-scrollbar-thumb { background: #9b59b6; border-radius: 5px; }
+body::-webkit-scrollbar-thumb:hover { background: #b278e5; }
+
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{
+  font-family:'Roboto',sans-serif;
+  background:#111;color:#eee;
+  min-height:100vh;position:relative;overflow-x:hidden;
+  animation: fadeIn 0.8s ease-in-out;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+  opacity:0.2;z-index:0;filter:brightness(0.3) grayscale(0.3);
+  pointer-events:none;
+}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;background:rgba(0,0,0,0.85);
+  position:fixed;width:100%;top:0;z-index:10;backdrop-filter:blur(6px);
+  animation: fadeDown 0.6s ease forwards;
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+header h1{color:#9b59b6;font-size:28px;cursor:pointer;transition:0.3s;}
+header h1:hover{color:#b278e5;}
+#categories-menu{position:relative;}
+#categories-menu button{
+  background:#0af;color:#111;padding:6px 10px;border:none;border-radius:6px;
+  cursor:pointer;transition:0.2s;
+}
+#categories-menu button:hover{background:#08d;}
+#categories-menu .dropdown{
+  display:none;position:absolute;top:35px;left:0;
+  background:#1e1e1e;border-radius:6px;overflow:hidden;
+  min-width:120px;z-index:20;
+}
+#categories-menu .dropdown div{padding:6px 10px;cursor:pointer;}
+#categories-menu .dropdown div:hover{background:#2a2a2a;}
+header .search-bar{width:250px;position:relative;}
+header .search-bar input{
+  width:100%;padding:6px 10px;border-radius:4px;border:none;
+  font-size:13px;background:#1e1e1e;color:#eee;outline: none;
+}
+#badge{
+  background:#9b59b6;color:#111;width:40px;height:40px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:18px;cursor:pointer;transition:0.3s;
+}
+#badge:hover{transform:scale(1.1);}
+main{
+  padding-top:120px;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+  max-width:1000px;margin:0 auto;padding-left:20px;padding-right:20px;
+}
+.store-container{
+  display:flex;flex-wrap:wrap;gap:20px;width:100%;padding-bottom:10px;
+}
+.store-container::-webkit-scrollbar {height: 8px;}
+.store-container::-webkit-scrollbar-track {background: #1e1e1e;border-radius: 4px;}
+.store-container::-webkit-scrollbar-thumb {background: #0af;border-radius: 4px;}
+.game-card{
+  flex: 0 0 200px;background:rgba(0,0,0,0.85);
+  border-radius:8px;padding:10px;text-align:left;color:#eee;
+  transition:transform 0.3s, box-shadow 0.3s;display:flex;flex-direction:column;justify-content:flex-start;
+  min-height:370px;opacity:0;transform:translateY(20px);animation: cardFadeUp 0.8s ease forwards;
+}
+@keyframes cardFadeUp{ to{opacity:1;transform:translateY(0);} }
+.game-card:hover{transform:translateY(-5px);box-shadow:0 8px 18px rgba(0,0,0,0.4);}
+.game-card img{width:100%;height:auto;border-radius:4px;margin-bottom:8px;}
+.game-card h3{font-size:18px;margin-bottom:6px;color:#9b59b6;}
+.game-card .categories{display:flex;flex-wrap:wrap;margin-bottom:6px;}
+.game-card .categories span{font-size:12px;background:#0af;color:#111;padding:2px 6px;border-radius:4px;margin-right:4px;margin-bottom:4px;}
+.game-card .description{flex-grow:1;display:flex;flex-direction:column;justify-content:flex-start;}
+.game-card p{font-size:12px;color:#ccc;margin-bottom:4px;}
+.game-card .button{display:block;width:100%;text-align:center;padding:6px 0;background:#0af;color:#111;font-weight:600;border-radius:6px;text-decoration:none;transition:0.3s;margin-top:8px;}
+.game-card .button:hover{background:#08d;}
+#search-results{position:absolute;top:32px;left:0;width:100%;background:#1e1e1e;border-radius:4px;max-height:200px;overflow-y:auto;display:none;z-index:15;}
+#search-results div{padding:6px 10px;display:flex;align-items:center;cursor:pointer;transition:0.2s;}
+#search-results div:hover{background:#2a2a2a;}
+#search-results img{width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:8px;}
+#no-results-box{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);padding:20px 30px;border-radius:10px;text-align:center;color:#eee;font-size:16px;z-index:50;}
+#no-results-box a{color:#0af;text-decoration:none;}
+#no-results-box a:hover{text-decoration:underline;}
+@media (max-width:800px){ .game-card{flex:0 0 160px; min-height:320px;} }
+@media (max-width:500px){ .game-card{flex:0 0 140px; min-height:280px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <h1 id="logo">ACROX</h1>
+    <div id="categories-menu">
+      <button id="categoriesBtn">Categorie ▾</button>
+      <div class="dropdown" id="categoriesDropdown">
+        <!-- Inserita opzione "Tutti" se vuoi resettare il filtro -->
+        <div data-category="Software">Software</div>
+        <div data-category="All">Tutti</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Cerca..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="badge">A</div>
+  </div>
+</header>
+<main>
+  <div class="store-container" id="store">
+    <div class="game-card" data-categories="Software">
+      <img src="https://i.ytimg.com/vi/e6v-6XGkL_4/maxresdefault.jpg" alt="Vegas16Pro">
+      <h3>Vegas16Pro</h3>
+      <div class="categories"><span>Software</span></div>
+      <div class="description">
+        <p>Editor video professionale, intuitivo, con supporto multi-traccia, 2D/3D e plugin OFX/VST. Perfetto per creare video di alta qualità.</p>
+      </div>
+      <a class="button" href="Vegas16Pro.html">Download</a>
+    </div>
+  </div> <!-- Chiusura store-container -->
+</main> <!-- Chiusura main -->
+
+<script>
+// --- GESTIONE BADGE E LOGO ---
+const userName = localStorage.getItem("userName") || "A";
+document.getElementById("badge").textContent = userName.charAt(0).toUpperCase();
+document.getElementById("logo").addEventListener("click", ()=>{
+    window.location.href = "index.html"; // porta sempre alla home
+});
+
+// --- GESTIONE DROPDOWN CATEGORIE (FIXED) ---
+const categoriesBtn = document.getElementById('categoriesBtn');
+const categoriesDropdown = document.getElementById('categoriesDropdown');
+const store = document.getElementById('store');
+const noResultsBox = document.getElementById('no-results-box');
+
+// Apri/Chiudi menu con stopPropagation
+categoriesBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    categoriesDropdown.style.display = categoriesDropdown.style.display === 'block' ? 'none' : 'block';
+});
+
+// Chiudi menu cliccando fuori
+document.addEventListener('click', (e) => {
+    if (!categoriesDropdown.contains(e.target) && e.target !== categoriesBtn) {
+        categoriesDropdown.style.display = 'none';
+    }
+});
+
+// Filtra giochi (Versione Robusta - Chiude subito il menu)
+document.querySelectorAll('#categoriesDropdown div').forEach(cat => {
+    cat.addEventListener('click', (e) => {
+        // 1. Blocca propagazione e CHIUDE SUBITO il menu
+        e.stopPropagation(); 
+        categoriesDropdown.style.display = 'none'; 
+
+        const selected = cat.dataset.category;
+        const cards = store.querySelectorAll('.game-card');
+        let anyVisible = false;
+
+        cards.forEach(card => {
+            const rawCats = card.getAttribute('data-categories');
+            const cats = rawCats ? rawCats.split(',') : [];
+            const isVisible = (selected === 'All' || cats.includes(selected));
+            
+            card.style.display = isVisible ? 'flex' : 'none';
+            if (isVisible) anyVisible = true;
+        });
+
+        if(noResultsBox) {
+            noResultsBox.style.display = anyVisible ? 'none' : 'block';
+        }
+    });
+});
+
+// --- GESTIONE RICERCA ---
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+// Ho aggiunto Vegas16Pro alla lista giochi così la ricerca funziona anche qui
+const games = [
+  {name:"BodyRecords", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3232040/header.jpg?t=1755610393", link:"BodyRecords.html"},
+  {name:"Lethal Company", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/header.jpg?t=1762544438", link:"Lethal Company.html"},
+  {name:"Macabre", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1794830/e489bdd0bd3c80ccf17ab6cc01be5290f4e8c8ac/header.jpg?t=1764541459", link:"Macabre.html"},
+  {name:"Ready or Not", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/header.jpg?t=1753984272", link:"ReadyOrNot.html"},
+  {name:"BodyCam", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2406770/bb577b428ed83ff9e3aa1c64844d1561814dffca/header.jpg?t=1764891119", link:"BodyCam.html"},
+  {name:"MIMESIS", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/8a2a6edc97fbf23ea6941974bdf4ed9a6ab34eb4/header.jpg?t=1764658096", link:"MIMESIS.html"},
+  {name:"Emissary Zero", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3176060/24364d74d56334dcb9b93031603a4ba107ecf0d7/header.jpg?t=1761402119", link:"EmissaryZero.html"},
+  {name:"Silent Breath", img:"silentbreath.png", link:"SilentBreath.html"},
+  {name:"SIDE EFFECTS", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3799100/ab45f12575f1e05377a5982eebd5bad800712ca2/header.jpg?t=1763737405", link:"SideEffects.html"},
+  {name:"CRYO", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2564910/header.jpg?t=1761331796", link:"Cryo.html"},
+  {name:"The Other Side", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2764750/ac1e5a495cb576601f98993c16010d74db819157/header.jpg?t=1762298167", link:"TheOtherSide.html"},
+  {name:"Panicore", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2695940/ae7913a03788c22d396b39f99cdea71d017a469d/header.jpg?t=1760284560", link:"Panicore.html"},
+  {name:"Content Warning", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2881650/header.jpg?t=1736717925", link:"ContentWarning.html"},
+  {name:"Peak", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3527290/bd3771d9a3827610b2742de13d8552918008c302/header_alt_assets_2.jpg?t=1762370967", link:"Peak.html"},
+  {name:"Friday the 13th", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/438740/header.jpg?t=1704032773", link:"FridayThe13th.html"},
+  {name:"MISERY", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2119830/f4aa2f3b4b352f7f373026fe592d32eef2c72fce/header.jpg?t=1763600148", link:"MISERY.html"},
+  {name:"REPO", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3241660/1ea445e044a2d5b09cfa8291350b63ebed6e5741/header.jpg?t=1761906910", link:"REPO.html"},
+  {name:"RV There Yet?", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/cae24b4ed7f4531be51f0d63f785b7d253f92dc3/header.jpg?t=1761681404", link:"RVThereYet.html"},
+  {name:"Look Your Door", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3004140/7fedf7839796819de0ea6923b2371b28901275e6/header.jpg?t=1763936939", link:"LookYourDoor.html"},
+  {name:"Granny Escape Together", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3070520/header.jpg?t=1762796057", link:"GrannyEscapeTogether.html"}
+];
+
+searchInput.addEventListener('input', () => {
+    const val = searchInput.value.toLowerCase();
+    searchResults.innerHTML = '';
+    if (val === '') { searchResults.style.display = 'none'; return; }
+    const filtered = games.filter(g => g.name.toLowerCase().startsWith(val));
+    filtered.forEach(g => {
+        const div = document.createElement('div');
+        div.innerHTML = `<img src="${g.img}" alt="${g.name}"><span>${g.name}</span>`;
+        div.addEventListener('click', () => { location.href = g.link; searchResults.style.display = 'none'; });
+        searchResults.appendChild(div);
+    });
+    searchResults.style.display = filtered.length ? 'block' : 'none';
+});
+
+searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        const game = games.find(g => g.name.toLowerCase() === searchInput.value.toLowerCase());
+        if (game) location.href = game.link;
+        else location.href = 'index.html';
+        searchResults.style.display = 'none';
+    }
+});
+
+document.addEventListener('click', e => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target))
+        searchResults.style.display = 'none';
+});
+</script>
+</body>
+</html>
