@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACROX Store - Software</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* 🎨 Personalizzazione Scrollbar principale (Verticale del Body) */
+body::-webkit-scrollbar { width: 1px; }
+body::-webkit-scrollbar-track { background: #1e1e1e; }
+body::-webkit-scrollbar-thumb { background: #9b59b6; border-radius: 5px; }
+body::-webkit-scrollbar-thumb:hover { background: #b278e5; }
+
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+body{
+    font-family:'Roboto',sans-serif;
+    background:#111;color:#eee;
+    min-height:100vh;position:relative;overflow-x:hidden;
+    animation: fadeIn 0.8s ease-in-out;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+body::before{
+    content:'';position:fixed;inset:0;
+    background:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+    opacity:0.2;z-index:0;filter:brightness(0.3) grayscale(0.3);
+    pointer-events:none;
+}
+header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 20px;background:rgba(0,0,0,0.85);
+    position:fixed;width:100%;top:0;z-index:10;backdrop-filter:blur(6px);
+    animation: fadeDown 0.6s ease forwards;
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+header h1{color:#9b59b6;font-size:28px;cursor:pointer;transition:0.3s;}
+header h1:hover{color:#b278e5;}
+#categories-menu{position:relative;}
+#categories-menu button{
+    background:#0af;color:#111;padding:6px 10px;border:none;border-radius:6px;
+    cursor:pointer;transition:0.2s;
+}
+#categories-menu button:hover{background:#08d;}
+#categories-menu .dropdown{
+    display:none;position:absolute;top:35px;left:0;
+    background:#1e1e1e;border-radius:6px;overflow:hidden;
+    min-width:120px;z-index:20;
+}
+#categories-menu .dropdown div{padding:6px 10px;cursor:pointer;}
+#categories-menu .dropdown div:hover{background:#2a2a2a;}
+header .search-bar{width:250px;position:relative;}
+header .search-bar input{
+    width:100%;padding:6px 10px;border-radius:4px;border:none;
+    font-size:13px;background:#1e1e1e;color:#eee;outline: none;
+}
+#badge-container { /* Nuovo ID del contenitore */
+    background: #9b59b6; /* Colore di fallback / bordo */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+    overflow: hidden; /* Fondamentale per mantenere l'immagine rotonda */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#badge-container:hover{transform:scale(1.1);}
+
+/* --- NUOVO CSS PIÙ PROFESSIONALE PER IL DROPDOWN DEL BADGE --- */
+#badge-menu-container {
+    position: relative;
+}
+#badge-dropdown {
+    display: none;
+    position: absolute;
+    top: 55px; /* Sotto il badge */
+    right: 0;
+    background: #1e1e1e;
+    border: 1px solid #9b59b6; /* Bordo viola */
+    border-radius: 8px; /* Bordo più arrotondato */
+    min-width: 220px; /* Larghezza maggiore per i testi */
+    z-index: 25;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); /* Ombra più marcata */
+    overflow: hidden;
+    padding: 5px 0; /* Padding verticale interno */
+}
+#badge-dropdown div {
+    display: flex; /* Permette l'allineamento di testo e icona */
+    align-items: center;
+    gap: 10px; /* Spazio tra icona e testo */
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #eee; /* Testo chiaro */
+    transition: background-color 0.2s, color 0.2s;
+}
+/* Stile al passaggio del mouse: viola ACROX */
+#badge-dropdown div:hover {
+    background: rgba(155, 89, 182, 0.2); /* Sfondo viola semitrasparente */
+    color: #9b59b6; /* Testo viola chiaro */
+}
+
+/* Aggiunge un divisore visivo per raggruppare le voci */
+.menu-separator {
+    height: 1px;
+    background: rgba(238, 238, 238, 0.1); /* Linea sottile grigia */
+    margin: 5px 0; /* Spazio sopra e sotto il separatore */
+}
+/* ------------------------------------------- */
+
+main{
+    padding-top:120px;
+    display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+    max-width:1000px;margin:0 auto;padding-left:20px;padding-right:20px;
+}
+.store-container{
+    display:flex;flex-wrap:wrap;gap:20px;width:100%;padding-bottom:10px;
+}
+.store-container::-webkit-scrollbar {height: 8px;}
+.store-container::-webkit-scrollbar-track {background: #1e1e1e;border-radius: 4px;}
+.store-container::-webkit-scrollbar-thumb {background: #0af;border-radius: 4px;}
+.game-card{
+    flex: 0 0 200px;background:rgba(0,0,0,0.85);
+    border-radius:8px;padding:10px;text-align:left;color:#eee;
+    transition:transform 0.3s, box-shadow 0.3s;display:flex;flex-direction:column;justify-content:flex-start;
+    min-height:370px;opacity:0;transform:translateY(20px);animation: cardFadeUp 0.8s ease forwards;
+}
+@keyframes cardFadeUp{ to{opacity:1;transform:translateY(0);} }
+.game-card:hover{transform:translateY(-5px);box-shadow:0 8px 18px rgba(0,0,0,0.4);}
+.game-card img{width:100%;height:auto;border-radius:4px;margin-bottom:8px;}
+.game-card h3{font-size:18px;margin-bottom:6px;color:#9b59b6;}
+.game-card .categories{display:flex;flex-wrap:wrap;margin-bottom:6px;}
+.game-card .categories span{font-size:12px;background:#0af;color:#111;padding:2px 6px;border-radius:4px;margin-right:4px;margin-bottom:4px;}
+.game-card .description{flex-grow:1;display:flex;flex-direction:column;justify-content:flex-start;}
+.game-card p{font-size:12px;color:#ccc;margin-bottom:4px;}
+.game-card .button{display:block;width:100%;text-align:center;padding:6px 0;background:#0af;color:#111;font-weight:600;border-radius:6px;text-decoration:none;transition:0.3s;margin-top:8px;}
+.game-card .button:hover{background:#08d;}
+#search-results{position:absolute;top:32px;left:0;width:100%;background:#1e1e1e;border-radius:4px;max-height:200px;overflow-y:auto;display:none;z-index:15;}
+#search-results div{padding:6px 10px;display:flex;align-items:center;cursor:pointer;transition:0.2s;}
+#search-results div:hover{background:#2a2a2a;}
+#search-results img{width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:8px;}
+#no-results-box{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);padding:20px 30px;border-radius:10px;text-align:center;color:#eee;font-size:16px;z-index:50;}
+#no-results-box a{color:#0af;text-decoration:none;}
+#no-results-box a:hover{text-decoration:underline;}
+@media (max-width:800px){ .game-card{flex:0 0 160px; min-height:320px;} }
+@media (max-width:500px){ .game-card{flex:0 0 140px; min-height:280px;} }
+/* Sovrascrivi il comportamento per i separatori */
+#badge-dropdown .menu-separator {
+    cursor: default; /* Rimuove l'icona "manina" */
+    pointer-events: none; /* **Questo è l'elemento chiave** - disabilita completamente gli eventi del mouse */
+}
+
+/* Rimuovi l'effetto hover specifico per i separatori */
+#badge-dropdown .menu-separator:hover {
+    background: none; /* Nessuno sfondo viola */
+    color: #eee; /* Colore del testo normale (anche se non c'è testo) */
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <h1 id="logo">ACROX</h1>
+    <div id="categories-menu">
+      <button id="categoriesBtn">Categorie ▾</button>
+      <div class="dropdown" id="categoriesDropdown">
+        <!-- Inserita opzione "Tutti" se vuoi resettare il filtro -->
+        <div data-category="Software">Software</div>
+        <div data-category="All">Tutti</div>
+      </div>
+    </div>
+  </div>
+
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Cerca giochi..." autocomplete="off">
+        <div id="search-results"></div>
+    </div>
+
+    <div id="badge-menu-container" style="display:flex;align-items:center;gap:10px;">
+        <button id="tutorialBtn" style="padding:6px 12px; font-size:14px; border:none; border-radius:5px; background:#0af; color:#111; font-weight:600; cursor:pointer; transition:0.2s;">
+            Tutorial
+        </button>
+
+        <div id="badge-container" onclick="document.getElementById('badge-dropdown').style.display = (document.getElementById('badge-dropdown').style.display === 'block') ? 'none' : 'block';">
+    <img id="badge-image" src="https://via.placeholder.com/40/9b59b6/ffffff?text=U" alt="Badge Profilo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+</div>
+
+        <div id="badge-dropdown">
+            <div onclick="window.location.href = 'profile.html';">👤 Profilo</div>
+            <div onclick="window.location.href = 'profile.html';">⚙️ Impostazioni</div>
+            
+            <div class="menu-separator"></div>
+
+            <div onclick="window.location.href = 'index.html';">🎮 Libreria Giochi</div>
+            <div onclick="window.location.href = 'software.html';">💻 Libreria Software</div>
+            
+            <div onclick="window.location.href = 'giochioffline.html';">🔌 Giochi Offline</div>
+
+          <div onclick="window.location.href = 'Amici.html';">👥 Amici</div>
+
+          <div onclick="window.location.href = 'Chat.html';">💬 Chat</div>
+
+
+
+            
+            <div class="menu-separator"></div>
+
+            <div onclick="console.log('Cliccato Giveaway');">🎁 Giveaway & Premi</div>
+            
+            <div class="menu-separator"></div>
+
+            <div onclick="console.log('Cliccato Esci / Logout');" style="color:#e74c3c;">❌ Esci</div>
+        </div>
+    </div>
+</header>
+
+<div id="tutorialModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:transparent; padding:0; border-radius:0; position:relative; max-width:90%; text-align:center;">
+        <span id="closeModal" style="position:absolute; top:8px; right:12px; font-size:24px; font-weight:bold; color:#fff; cursor:pointer; z-index:1001; text-shadow: 0 0 4px #000;">&times;</span>
+        <video id="tutorialVideo" width="600" controls style="display:block; box-shadow: 0 10px 25px #000;">
+            <source src="Tutorial.mp4" type="video/mp4">
+            Il tuo browser non supporta il video.
+        </video>
+    </div>
+</div>
+
+<main>
+  <div class="store-container" id="store">
+    <div class="game-card" data-categories="Software">
+      <img src="https://i.ytimg.com/vi/e6v-6XGkL_4/maxresdefault.jpg" alt="Vegas16Pro">
+      <h3>Vegas16Pro</h3>
+      <div class="categories"><span>Software</span></div>
+      <div class="description">
+        <p>Editor video professionale, intuitivo, con supporto multi-traccia, 2D/3D e plugin OFX/VST. Perfetto per creare video di alta qualità.</p>
+      </div>
+      <a class="button" href="Vegas16Pro.html">Download</a>
+    </div>
+  </div> <!-- Chiusura store-container -->
+</main> <!-- Chiusura main -->
+
+<script>
+// --- GESTIONE BADGE E LOGO ---
+const userName = localStorage.getItem("userName") || "ACROX"; // Fallback migliore
+const badgeContainer = document.getElementById("badge-container"); // <--- CORRETTO: nuovo ID
+const badgeImage = document.getElementById("badge-image"); // <--- CORRETTO: nuovo ID
+const badgeDropdown = document.getElementById("badge-dropdown");
+
+// Carica l'immagine salvata dal profile.html
+const savedProfileImage = localStorage.getItem('profileImage');
+if (savedProfileImage) {
+    badgeImage.src = savedProfileImage;
+}
+// Se non c'è immagine, usiamo la prima lettera come fallback (ma non la usiamo se c'è l'immagine placeholder)
+// Nota: Non serve impostare userName.charAt(0).toUpperCase() su badgeImage perché l'immagine placeholder lo fa già.
+
+document.getElementById("logo").addEventListener("click", ()=>{
+    window.location.href = "index.html"; // porta sempre alla home
+});
+
+// --- GESTIONE DROPDOWN BADGE CORRETTA ---
+if (badgeContainer) {
+    // 1. Apri/Chiudi il dropdown cliccando sul contenitore del badge
+    badgeContainer.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impedisce che il click chiuda immediatamente il dropdown
+        badgeDropdown.style.display = badgeDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // 2. Chiudi il menu del badge cliccando fuori
+    document.addEventListener('click', (e) => {
+        // Chiudi solo se il click non è sul badgeContainer e non è all'interno del dropdown
+        if (!badgeContainer.contains(e.target) && !badgeDropdown.contains(e.target)) {
+            badgeDropdown.style.display = 'none';
+        }
+    });
+}
+// --- FINE GESTIONE DROPDOWN BADGE ---
+
+// --- GESTIONE DROPDOWN CATEGORIE ---
+const categoriesBtn = document.getElementById('categoriesBtn');
+const categoriesDropdown = document.getElementById('categoriesDropdown');
+const store = document.getElementById('store');
+const noResultsBox = document.getElementById('no-results-box');
+
+// Apri/Chiudi menu con stopPropagation per evitare conflitti
+categoriesBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    categoriesDropdown.style.display = categoriesDropdown.style.display === 'block' ? 'none' : 'block';
+});
+
+// Chiudi menu cliccando fuori
+document.addEventListener('click', (e) => {
+    if (!categoriesDropdown.contains(e.target) && e.target !== categoriesBtn) {
+        categoriesDropdown.style.display = 'none';
+    }
+});
+
+// Filtra giochi
+document.querySelectorAll('#categoriesDropdown div').forEach(cat => {
+    cat.addEventListener('click', (e) => {
+        // 1. Blocca propagazione e CHIUDE SUBITO il menu
+        e.stopPropagation(); 
+        categoriesDropdown.style.display = 'none'; 
+
+        const selected = cat.dataset.category;
+        const cards = store.querySelectorAll('.game-card');
+        let anyVisible = false;
+
+        // 2. Logica di filtraggio (con protezione anti-crash)
+        cards.forEach(card => {
+            // Leggiamo l'attributo in modo sicuro
+            const rawCats = card.getAttribute('data-categories');
+            // Se l'attributo manca, usiamo un array vuoto per non bloccare lo script
+            const cats = rawCats ? rawCats.split(',') : [];
+            
+            const isVisible = (selected === 'All' || cats.includes(selected));
+            card.style.display = isVisible ? 'flex' : 'none';
+            
+            if (isVisible) anyVisible = true;
+        });
+
+        // 3. Gestione box "Nessun risultato"
+        if(noResultsBox) {
+            noResultsBox.style.display = anyVisible ? 'none' : 'block';
+        }
+    });
+});
+// --- GESTIONE RICERCA ---
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+const games = [
+  {name:"BodyRecords", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3232040/header.jpg?t=1755610393", link:"BodyRecords.html"},
+  {name:"Lethal Company", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/header.jpg?t=1762544438", link:"Lethal Company.html"},
+  {name:"Macabre", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1794830/e489bdd0bd3c80ccf17ab6cc01be5290f4e8c8ac/header.jpg?t=1764541459", link:"Macabre.html"},
+  {name:"Ready or Not", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/header.jpg?t=1753984272", link:"ReadyOrNot.html"},
+  {name:"BodyCam", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2406770/bb577b428ed83ff9e3aa1c64844d1561814dffca/header.jpg?t=1764891119", link:"BodyCam.html"},
+  {name:"MIMESIS", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/8a2a6edc97fbf23ea6941974bdf4ed9a6ab34eb4/header.jpg?t=1764658096", link:"MIMESIS.html"},
+  {name:"Emissary Zero", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3176060/24364d74d56334dcb9b93031603a4ba107ecf0d7/header.jpg?t=1761402119", link:"EmissaryZero.html"},
+  {name:"Silent Breath", img:"silentbreath.png", link:"SilentBreath.html"},
+  {name:"SIDE EFFECTS", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3799100/ab45f12575f1e05377a5982eebd5bad800712ca2/header.jpg?t=1763737405", link:"SideEffects.html"},
+  {name:"CRYO", img:"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2564910/header.jpg?t=1761331796", link:"Cryo.html"},
+  {name:"The Other Side", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2764750/ac1e5a495cb576601f98993c16010d74db819157/header.jpg?t=1762298167", link:"TheOtherSide.html"},
+  {name:"Panicore", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2695940/ae7913a03788c22d396b39f99cdea71d017a469d/header.jpg?t=1760284560", link:"Panicore.html"},
+  {name:"Content Warning", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2881650/header.jpg?t=1736717925", link:"ContentWarning.html"},
+  {name:"Peak", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3527290/bd3771d9a3827610b2742de13d8552918008c302/header_alt_assets_2.jpg?t=1762370967", link:"Peak.html"},
+  {name:"Friday the 13th", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/438740/header.jpg?t=1704032773", link:"FridayThe13th.html"},
+  {name:"MISERY", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2119830/f4aa2f3b4b352f7f373026fe592d32eef2c72fce/header.jpg?t=1763600148", link:"MISERY.html"},
+  {name:"REPO", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3241660/1ea445e044a2d5b09cfa8291350b63ebed6e5741/header.jpg?t=1761906910", link:"REPO.html"},
+  {name:"RV There Yet?", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3949040/cae24b4ed7f4531be51f0d63f785b7d253f92dc3/header.jpg?t=1761681404", link:"RVThereYet.html"},
+  {name:"Pizza Deathlivery", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3697560/09596d1d2c3a6967e1ef9599739b76ff489ffedb/header.jpg?t=1763386816", link:"PizzaDeathlivery.html"},
+  {name:"Look Your Door", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3004140/7fedf7839796819de0ea6923b2371b28901275e6/header.jpg?t=1763936939", link:"LookYourDoor.html"},
+  {name:"Granny Escape Together", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3070520/header.jpg?t=1762796057", link:"GrannyEscapeTogether.html"},
+  {name:"Backroom Company", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3010460/ce664e54209f580622072902add7e525ab24b121/header.jpg?t=1753862334", link:"BackroomCompany.html"},
+  {name:"Climb The Backrooms", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3575300/125a1516b16ce033aa6ed0bf1116c64c7883df9d/header.jpg?t=1753178014", link:"ClimbTheBackrooms.html"},
+  {name:"Cursed Companions", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3265230/header.jpg?t=1764341388", link:"CursedCompanions.html"},
+  {name:"Deadly Quiet", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3419130/header.jpg?t=1749380596", link:"DeadlyQuiet.html"},
+  {name:"Explosive Odds", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3674980/269e953c770b781803997e4da74ca53f190fa031/header.jpg?t=1764703673", link:"Explosive Odds.html"},
+  {name:"Keep Digging", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3585800/9b2548eda14759f6a4aa1d861ca100c7c437bbe8/header.jpg?t=1757581771", link:"KeepDigging.html"},
+  {name:"Try To Drive", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3621700/defa537fea0d08c31eab9d1828875b8a42fc1430/header.jpg?t=1763746736", link:"TryToDrive.html"},
+  {name:"Exit Together", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3333740/header.jpg?t=1764625982", link:"ExitTogether.html"},
+  {name:"Mage Arena", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3716600/e09e178465c67642c1214736e29d64846d966e52/header.jpg?t=1754585254", link:"MageArena.html"},
+  {name:"Frog Jump", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3448750/3f741a66ae98d8185f0bb7adaed6e1f9539a83f5/header.jpg?t=1762810909", link:"FrogJump.html"},
+  {name:"USAC: Code Breach", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1886070/header.jpg?t=1729186951", link:"USACCode.html"},
+  {name:"Crime Simulator", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2737070/header.jpg?t=1764671705", link:"CrimeSimulator.html"},
+  {name:"CUFFBUST", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2592220/header.jpg?t=1760535283", link:"CUFFBUST.html"},
+  {name:"Long Drive North", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3179350/header.jpg?t=1763573191", link:"LongDrive.html"},
+  {name:"Stuck Together", img:"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3295360/8cfb2382805e292efa2b52a0e69eb4f5fdb2bec1/header.jpg?t=1763744604", link:"StuckTogether.html"}
+];
+
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    searchResults.innerHTML = '';
+
+    if (query.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    const filteredGames = games
+        .filter(game => game.name.toLowerCase().startsWith(query)) // SOLO iniziale
+        .slice(0, 4); // MASSIMO 4 risultati
+
+    if (filteredGames.length > 0) {
+        filteredGames.forEach(game => {
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `
+                <img src="${game.img}" alt="${game.name}">
+                <span>${game.name}</span>
+            `;
+            resultDiv.addEventListener('click', () => {
+                window.location.href = game.link;
+            });
+            searchResults.appendChild(resultDiv);
+        });
+        searchResults.style.display = 'block';
+    } else {
+        searchResults.style.display = 'none';
+    }
+});
+
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Gestione del dropdown del badge (se necessario)
+    const badgeContainer = document.getElementById('badge-container');
+    const badgeDropdown = document.getElementById('badge-dropdown');
+
+    if (badgeContainer) {
+        badgeContainer.addEventListener('click', (e) => {
+            // Impedisce la chiusura immediata se l'evento bolla
+            e.stopPropagation();
+            badgeDropdown.style.display = (badgeDropdown.style.display === 'block') ? 'none' : 'block';
+        });
+
+        // Chiude il dropdown se si clicca fuori
+        document.addEventListener('click', (e) => {
+            if (badgeDropdown && !badgeContainer.contains(e.target)) {
+                badgeDropdown.style.display = 'none';
+            }
+        });
+    }
+
+
+    // -----------------------------------------------------------------
+    // LOGICA PRINCIPALE: Caricamento Immagine Profilo dal localStorage
+    // -----------------------------------------------------------------
+    const badgeImage = document.getElementById('badge-image');
+    const savedProfileImage = localStorage.getItem('profileImage');
+    
+    if (savedProfileImage && badgeImage) {
+        // Se c'è un'immagine salvata, la applichiamo all'SRC del badge
+        badgeImage.src = savedProfileImage;
+    }
+    // Se non c'è, verrà usata l'immagine di placeholder definita nell'HTML
+    // -----------------------------------------------------------------
+
+});
+</script>
+</body>
+</html>
