@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ACROX - Editor Profilo Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="JavaScript/Theme/theme.js" defer></script>
+    <style>
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Fredoka', sans-serif; 
+            /* Disabilita la selezione del testo ovunque */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        body { 
+            height: 100vh; 
+            display: flex; 
+            color: white; 
+            background: #202225; 
+            overflow: hidden; 
+            position: relative; 
+            opacity: 0; 
+            transition: opacity 0.15s ease-in-out; 
+        }
+
+        /* Scrollbar Personalizzata */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+        * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.05); }
+
+        .sidebar { width: 300px; background: rgba(0,0,0,0.2); backdrop-filter: blur(15px); padding: 40px 20px; border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+        .profile-card { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #ddd; object-fit: cover; }
+        .profile-info h4 { font-size: 14px; }
+        .profile-info p { font-size: 11px; opacity: 0.7; }
+        .nav-header { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 10px; margin-top: 20px; }
+        .nav-item { padding: 10px; cursor: pointer; border-radius: 8px; background: rgba(255,255,255,0.05); margin-bottom: 5px; color: white; text-decoration: none; }
+
+        .content { flex-grow: 1; padding: 60px; display: flex; justify-content: center; overflow-y: auto; }
+        .editor-wrapper { width: 100%; max-width: 450px; }
+        
+        .banner-container { position: relative; height: 120px; width: 100%; cursor: pointer; }
+        .banner-box { height: 120px; width: 100%; background: #333; border-radius: 8px 8px 0 0; position: relative; background-position: center; background-size: cover; }
+        .watermark-edit { position: absolute; top: 10px; right: 15px; color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 600; pointer-events: none; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; }
+        
+        .edit-pen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); opacity: 0; transition: 0.3s; font-size: 24px; border-radius: 8px 8px 0 0; }
+        .banner-container:hover .edit-pen { opacity: 1; }
+        
+        .color-palette { display: none; margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; justify-content: center; gap: 10px; }
+        .color-circle { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: 0.2s; }
+        .color-circle:hover { transform: scale(1.1); border-color: white; }
+
+        .section { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 0 0 8px 8px; }
+        .avatar-edit { width: 100px; height: 100px; border-radius: 50%; position: relative; cursor: pointer; margin-top: -65px; border: 4px solid #202225; overflow: hidden; margin-bottom: 20px; background: #333; }
+        .avatar-edit .edit-pen { opacity: 0; transition: 0.3s; border-radius: 50%; }
+        .avatar-edit:hover .edit-pen { opacity: 1; }
+        .in-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .bio-counter { font-size: 12px; opacity: 0.5; font-weight: 600; }
+
+        input, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 4px; 
+            color: white; 
+            margin-top: 5px; 
+            margin-bottom: 15px; 
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        /* Disabilita il ridimensionamento manuale e nasconde totalmente la barra dello scroll */
+        .in-bio-textarea { height: 100px; resize: none; overflow: hidden; }
+
+        /* Contenitore Selettore Tema Stile Discord Nitro */
+        .editor-theme-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.15); padding: 15px; border-radius: 8px; }
+        .editor-dots-wrapper { display: flex; gap: 15px; margin-top: 5px; }
+        .color-picker-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
+        .color-picker-label { font-size: 11px; opacity: 0.6; text-transform: uppercase; }
+        .editor-dot-btn { width: 44px; height: 44px; border-radius: 8px; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: 0.2s; position: relative; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .editor-dot-btn:hover { transform: scale(1.05); border-color: white; }
+
+        /* Preview Area */
+        .preview-area { width: 350px; padding: 50px; background: rgba(0,0,0,0.1); border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; display: flex; flex-direction: column; }
+        .preview-title { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Card Bio - Ridotta altezza totale e armonizzata */
+        .card-p { background: #2f3136; border-radius: 8px; overflow: hidden; border: 1px solid #111112; transition: background 0.3s ease; position: relative; padding-bottom: 10px; height: 360px; display: flex; flex-direction: column; }
+        .card-p.active-profile { box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); border-color: var(--theme-accent, #7289da); }
+        .banner-p { height: 120px; background: #333; position: relative; background-position: center; background-size: cover; border: none; flex-shrink: 0; }
+        
+        .profile-preview-header { display: flex; flex-direction: column; align-items: flex-start; padding: 0 16px; margin-top: -50px; position: relative; z-index: 2; flex-shrink: 0; }
+        .avatar-p { width: 90px; height: 90px; border-radius: 50%; border: 6px solid #2f3136; flex-shrink: 0; object-fit: cover; background: #333; transition: border-color 0.3s ease; }
+        
+        .name-container { margin-top: 10px; width: 100%; position: relative; }
+        
+        .header-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; width: 100%; justify-content: flex-start; }
+        .p-name-style { font-size: 20px; word-break: break-word; font-weight: 700; }
+        .p-pro-style { opacity: 0.6; font-size: 14px; font-weight: 400; display: inline-block; vertical-align: baseline; }
+        .p-user-style { font-size: 15px; opacity: 0.7; margin-top: 2px; margin-bottom: 8px; word-break: break-word; }
+
+        /* Rimossa totalmente la barra di scroll verticale sulla biografia dell'anteprima (a destra) */
+        .p-bio-style { padding: 8px 16px 16px 16px; font-size: 14px; opacity: 0.9; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; margin-top: 5px; border: none; display: block; flex-grow: 1; max-height: 120px; overflow: hidden; }
+        
+        /* Sizing perfetto per le emoji inserite nella bio */
+        .p-bio-style .bio-custom-emoji {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            vertical-align: bottom;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .preview-wrapper { display: flex; flex-direction: column; margin-bottom: 60px; }
+        .preview-wrapper:last-child { margin-bottom: 20px; }
+
+        .btn-set-profile { width: 100%; background: var(--theme-button-bg, #3a3f44); color: var(--theme-button-text, white); border: none; padding: 12px; border-radius: 8px; margin-top: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-set-profile:hover { filter: brightness(1.2); }
+        .btn-set-profile.current-active { background: var(--theme-success, #2ecc71); color: white; cursor: default; }
+        .btn-set-profile.current-active:hover { filter: none; }
+
+        #save-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2f3136; padding: 15px 25px; border-radius: 8px; display: none; align-items: center; gap: 20px; border: 1px solid var(--theme-success, #2ecc71); z-index: 999; }
+        #save-bar button { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        #save-bar button:hover { background: rgba(255,255,255,0.2); }
+        #save-bar .btn-save { background: var(--theme-success, #2ecc71); color: white; }
+        #save-bar .btn-save:hover { filter: brightness(1.1); }
+
+        .notification-toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #2f3136; padding: 16px 28px; border-radius: 8px; display: flex; align-items: center; gap: 12px; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border-left: 5px solid var(--theme-accent, #7289da); transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-weight: 600; font-size: 14px; }
+        .notification-toast.show { top: 20px; }
+        .notification-toast.error { border-left-color: var(--theme-error, #f04747); }
+        .notification-toast.success { border-left-color: var(--theme-success, #43b581); }
+
+        .crop-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
+        .crop-container { background: #2f3136; padding: 25px; border-radius: 12px; max-width: 90%; width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .crop-box-wrapper { position: relative; width: 100%; height: 300px; overflow: hidden; background: #1e1f22; border-radius: 6px; cursor: grab; display: flex; align-items: center; justify-content: center; }
+        .crop-box-wrapper.shape-avatar { border-radius: 50%; }
+        .crop-box-wrapper.shape-banner { border-radius: 6px; }
+        .crop-btn-confirm { background: var(--theme-success, #2ecc71); color: white; border: none; padding: 10px 24px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 13px; z-index: 5; }
+        .crop-btn-confirm:hover { filter: brightness(1.1); }
+    </style>
+</head>
+<body>
+
+    <div id="toast-notification" class="notification-toast">
+        <span id="toast-message">Messaggio di notifica</span>
+    </div>
+
+    <div id="crop-modal" class="crop-modal">
+        <div class="crop-container">
+            <h3>Adatta e Ridimensiona File</h3>
+            <p style="font-size: 13px; opacity: 0.7; text-align: center; margin-top: -10px;">Trascina o usa le FRECCE della tastiera per posizionare l'immagine.</p>
+            <div id="crop-wrapper" class="crop-box-wrapper">
+                <img id="crop-image-preview" class="crop-image-render" src="" style="transform: translate(0px, 0px);">
+            </div>
+            <button class="crop-btn-confirm" onclick="confirmCrop()">Conferma e Ritaglia</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="profile-card">
+            <img id="sidebar-avatar" class="avatar" src="Images/acrox_profile.png">
+            <div class="profile-info">
+                <h4 id="sidebar-username">Nome Utente</h4>
+                <p>Profilo</p>
+            </div>
+        </div>
+        <div class="nav-header">IMPOSTAZIONI UTENTE</div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">← Torna Indietro</div>
+    </div>
+
+    <div class="content">
+        <div class="editor-wrapper">
+            
+            <div class="banner-container" onclick="togglePalette('color-palette-1')">
+                <div id="banner-display-1" class="banner-box">
+                    <div class="watermark-edit">Senza AISOS</div>
+                    <div class="edit-pen">✎</div>
+                </div>
+            </div>
+            
+            <div class="section" style="margin-bottom: 40px;">
+                <div class="avatar-edit" onclick="document.getElementById('a-upload-1').click()">
+                    <div class="edit-pen">✎</div>
+                    <img id="in-avatar-1" class="in-avatar-img" src="Images/acrox_profile.png">
+                    <input type="file" id="a-upload-1" hidden accept=".png, .jpg, .jpeg" onchange="handleImageUpload(this, 1, 'avatar')">
+                </div>
+                
+                <div id="color-palette-1" class="color-palette">
+                    <div class="color-circle" style="background: #333;" onclick="changeBannerColor('#333', 1)"></div>
+                    <div class="color-circle" style="background: #e74c3c;" onclick="changeBannerColor('#e74c3c', 1)"></div>
+                    <div class="color-circle" style="background: #3498db;" onclick="changeBannerColor('#3498db', 1)"></div>
+                    <div class="color-circle" style="background: #2ecc71;" onclick="changeBannerColor('#2ecc71', 1)"></div>
+                    <div class="color-circle" style="background: #f1c40f;" onclick="changeBannerColor('#f1c40f', 1)"></div>
+                    <div class="color-circle" style="background: #9b59b6;" onclick="changeBannerColor('#9b59b6', 1)"></div>
+                </div>
+                
+                <label>Nome</label>
+                <input type="text" id="in-name-1" oninput="updatePreview(1)">
+                <label>Nome Utente</label>
+                <input type="text" id="in-user-1" oninput="updatePreview(1)">
+                <label>Pronomi</label>
+                <input type="text" id="in-pro-1" oninput="updatePreview(1)">
+                
+                <div class="label-row">
+                    <label>Bio</label>
+                    <span id="bio-counter-1" class="bio-counter">0/143</span>
+                </div>
+                <textarea id="in-bio-1" class="in-bio-textarea" oninput="updatePreview(1)" onkeydown="checkBioLimit(event, 1)"></textarea>
+            </div>
+
+            <hr style="margin:40px 0; border: 0; border-top: 1px solid #444;">
+
+            <div class="banner-container" onclick="document.getElementById('b-upload-2').click()">
+                <div id="banner-display-2" class="banner-box">
+                    <div class="watermark-edit">Con AISOS ✎</div>
+                    <div class="edit-pen">✎</div>
+                </div>
+                <input type="file" id="b-upload-2" hidden accept=".png, .jpg, .jpeg, .gif" onchange="handleImageUpload(this, 2, 'banner')">
+            </div>
+            
+            <div class="section">
+                <div class="avatar-edit" onclick="document.getElementById('a-upload-2').click()">
+                    <div class="edit-pen">✎</div>
+                    <img id="in-avatar-2" class="in-avatar-img" src="Images/acrox_profile.png">
+                    <input type="file" id="a-upload-2" hidden accept=".png, .jpg, .jpeg, .gif" onchange="handleImageUpload(this, 2, 'avatar')">
+                </div>
+
+                <div class="editor-theme-selector">
+                    <span style="font-size: 14px; font-weight: 700;">Tema del profilo</span>
+                    <div class="editor-dots-wrapper">
+                        <div class="color-picker-wrapper">
+                            <span class="color-picker-label">Primario</span>
+                            <div id="dot-target-1" class="editor-dot-btn" style="background: #7289da;" onclick="document.getElementById('picker-1').click()">🖊</div>
+                            <input type="color" id="picker-1" value="#7289da" style="opacity:0; position:absolute; inset:0; width:100%; height:100%; cursor:pointer;" oninput="updateLiveMixColor()">
+                        </div>
+                        <div class="color-picker-wrapper">
+                            <span class="color-picker-label">Secondario</span>
+                            <div id="dot-target-2" class="editor-dot-btn" style="background: #2c2f33;" onclick="document.getElementById('picker-2').click()">🖊</div>
+                            <input type="color" id="picker-2" value="#2c2f33" style="opacity:0; position:absolute; inset:0; width:100%; height:100%; cursor:pointer;" oninput="updateLiveMixColor()">
+                        </div>
+                    </div>
+                </div>
+                
+                <label>Nome</label>
+                <input type="text" id="in-name-2" oninput="updatePreview(2)">
+                <label>Nome Utente</label>
+                <input type="text" id="in-user-2" oninput="updatePreview(2)">
+                <label>Pronomi</label>
+                <input type="text" id="in-pro-2" oninput="updatePreview(2)">
+                
+                <div class="label-row">
+                    <label>Bio</label>
+                    <span id="bio-counter-2" class="bio-counter">0/143</span>
+                </div>
+                <textarea id="in-bio-2" class="in-bio-textarea" oninput="updatePreview(2)" onkeydown="checkBioLimit(event, 2)"></textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="preview-area">
+        <div class="preview-wrapper">
+            <div class="preview-title">Senza AISOS</div>
+            <div id="card-block-1" class="card-p">
+                <div id="p-banner-1" class="banner-p"></div>
+                <div class="profile-preview-header">
+                    <img id="p-avatar-1" class="avatar-p" src="Images/acrox_profile.png">
+                    <div class="name-container">
+                        <div class="header-row">
+                            <h2 id="p-name-1" class="p-name-style">Nome Utente</h2>
+                            <span id="p-pro-1" class="p-pro-style"></span>
+                        </div>
+                        <p id="p-username-display-1" class="p-user-style">@nomeutente</p>
+                    </div>
+                </div>
+                <div id="p-bio-1" class="p-bio-style"></div>
+            </div>
+            <button id="btn-set-1" class="btn-set-profile" onclick="impostaProfilo(1)">Imposta</button>
+        </div>
+    
+        <div class="preview-wrapper">
+            <div class="preview-title">Con AISOS</div>
+            <div id="card-block-2" class="card-p">
+                <div id="p-banner-2" class="banner-p"></div>
+                <div class="profile-preview-header">
+                    <img id="p-avatar-2" class="avatar-p" src="Images/acrox_profile.png">
+                    <div class="name-container">
+                        <div class="header-row">
+                            <h2 id="p-name-2" class="p-name-style">Nome Utente</h2>
+                            <span id="p-pro-2" class="p-pro-style"></span>
+                        </div>
+                        <p id="p-username-display-2" class="p-user-style">@nomeutente</p>
+                    </div>
+                </div>
+                <div id="p-bio-2" class="p-bio-style"></div>
+            </div>
+            <button id="btn-set-2" class="btn-set-profile" onclick="impostaProfilo(2)">Imposta</button>
+        </div>
+    </div>
+
+    <div id="save-bar">
+        <span>Modifiche non salvate!</span>
+        <button onclick="ripristinaDatiSenzaScroll()">Ripristina</button>
+        <button class="btn-save" onclick="saveData()">Salva Modifiche</button>
+    </div>
+
+    <script>
+        let tempAvatar1 = null;
+        let tempAvatar2 = null;
+        let tempBanner2 = null;
+        let currentCropTask = null;
+        let isDragging = false;
+        let startX, startY;
+        let translateX = 0, translateY = 0;
+
+        function showNotification(text, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const msg = document.getElementById('toast-message');
+            toast.className = `notification-toast ${type} show`;
+            msg.innerText = text;
+            setTimeout(() => { toast.classList.remove('show'); }, 5000);
+        }
+
+        function togglePalette(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Calcola la lunghezza della bio considerando il peso speciale delle Emoji (NATIVE + CUSTOM :nome:)
+        function calcolaLunghezzaBio(testo) {
+            let conteggio = 0;
+            const emojiSalvate = JSON.parse(localStorage.getItem('acrox_emoji_list')) || [];
+            let tempTesto = testo;
+
+            // 1. Riconosce e calcola le emoji custom salvate nella lista (es: :nome_emoji:)
+            emojiSalvate.forEach(emoji => {
+                if (emoji.nome) {
+                    const regex = new RegExp(emoji.nome.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                    const match = tempTesto.match(regex);
+                    if (match) {
+                        conteggio += match.length * 25;
+                        tempTesto = tempTesto.replace(regex, ''); // Rimuove per non ricalcolarle
+                    }
+                }
+            });
+
+            // 2. Riconosce e calcola le emoji native di sistema (Unicode standard)
+            const regexEmojiNative = /[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F191}-\u{1F251}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu;
+            const matchNative = tempTesto.match(regexEmojiNative);
+            if (matchNative) {
+                conteggio += matchNative.length * 25;
+                tempTesto = tempTesto.replace(regexEmojiNative, '');
+            }
+
+            // 3. Tutto il resto (lettere, spazi, invii) vale 1 ad elemento
+            conteggio += Array.from(tempTesto).length;
+            return conteggio;
+        }
+
+        // Controlla e limita l'inserimento di caratteri se si supera il valore di 143 o l'altezza visiva dell'invio
+        function checkBioLimit(e, blockNum) {
+            const tastiConsentiti = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Control', 'Meta', 'a', 'c', 'x', 'v'];
+            
+            // Permetti sempre i tasti di controllo di sistema
+            if (tastiConsentiti.includes(e.key) || e.ctrlKey || e.metaKey) {
+                return;
+            }
+
+            // Se l'utente clicca Invio, blocca se l'altezza del testo supera già la visualizzazione dell'editor
+            if (e.key === 'Enter') {
+                if (e.target.scrollHeight > e.target.clientHeight) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+            // Calcola il peso attuale prima dell'inserimento del tasto premuto
+            const pesoTotale = calcolaLunghezzaBio(e.target.value);
+            
+            // Se si è già a 143 o più, impedisce l'aggiunta di nuove lettere
+            if (pesoTotale >= 143) {
+                e.preventDefault();
+            }
+        }
+
+        function updateLiveMixColor(isSilent = false) {
+            const c1 = document.getElementById('picker-1').value;
+            const c2 = document.getElementById('picker-2').value;
+
+            document.getElementById('dot-target-1').style.backgroundColor = c1;
+            document.getElementById('dot-target-2').style.backgroundColor = c2;
+
+            const targetCard = document.getElementById('card-block-2');
+            targetCard.style.background = `linear-gradient(180deg, ${c1} 0%, ${c2} 100%)`;
+            
+            document.getElementById('p-avatar-2').style.borderColor = c1;
+            if(!isSilent) document.getElementById('save-bar').style.display = 'flex';
+        }
+
+        function changeBannerColor(color, blockNum, isSilent = false) {
+            if(blockNum === 1) {
+                document.getElementById('p-banner-1').style.backgroundImage = 'none';
+                document.getElementById('banner-display-1').style.backgroundImage = 'none';
+                document.getElementById('p-banner-1').style.backgroundColor = color;
+                document.getElementById('banner-display-1').style.backgroundColor = color;
+            }
+            if(!isSilent) document.getElementById('save-bar').style.display = 'flex';
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function updatePreview(blockNum, isSilent = false) {
+            let bioTextArea = document.getElementById('in-bio-' + blockNum);
+            let bioValue = bioTextArea.value;
+
+            // Ulteriore barriera di sicurezza per i "copia e incolla" massivi o per sforamenti di invio
+            let pesoCaratteri = calcolaLunghezzaBio(bioValue);
+            if (pesoCaratteri > 143) {
+                while (calcolaLunghezzaBio(bioValue) > 143 && bioValue.length > 0) {
+                    bioValue = bioValue.slice(0, -1);
+                }
+                bioTextArea.value = bioValue;
+                pesoCaratteri = calcolaLunghezzaBio(bioValue);
+            }
+
+            // Impedisce l'aggiunta di testo se l'altezza complessiva supera il box visivo
+            if (bioTextArea.scrollHeight > bioTextArea.clientHeight) {
+                while (bioTextArea.scrollHeight > bioTextArea.clientHeight && bioValue.length > 0) {
+                    bioValue = bioValue.slice(0, -1);
+                    bioTextArea.value = bioValue;
+                }
+                pesoCaratteri = calcolaLunghezzaBio(bioValue);
+            }
+
+            const nameValue = document.getElementById('in-name-' + blockNum).value || 'Nome Utente';
+            const userValue = document.getElementById('in-user-' + blockNum).value ? `@${document.getElementById('in-user-' + blockNum).value}` : '@nomeutente';
+            const proValue = document.getElementById('in-pro-' + blockNum).value ? `${document.getElementById('in-pro-' + blockNum).value}` : '';
+
+            // Aggiornamento contatore dinamico dei caratteri
+            const contatoreElement = document.getElementById('bio-counter-' + blockNum);
+            contatoreElement.innerText = `${pesoCaratteri}/143`;
+            contatoreElement.style.color = 'rgba(255, 255, 255, 0.5)';
+
+            document.getElementById('p-name-' + blockNum).innerText = nameValue;
+            document.getElementById('p-username-display-' + blockNum).innerText = userValue;
+            
+            const proSpan = document.getElementById('p-pro-' + blockNum);
+            if(proValue) {
+                proSpan.innerText = ` - ${proValue}`;
+                proSpan.style.display = 'inline-block';
+            } else {
+                proSpan.innerText = '';
+                proSpan.style.display = 'none';
+            }
+            
+            let bioHTML = escapeHTML(bioValue);
+            const emojiSalvate = JSON.parse(localStorage.getItem('acrox_emoji_list')) || [];
+            
+            emojiSalvate.forEach(emoji => {
+                if (emoji.nome && emoji.src) {
+                    const regex = new RegExp(emoji.nome.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                    bioHTML = bioHTML.replace(regex, `<img src="${emoji.src}" class="bio-custom-emoji" alt="${emoji.nome}" title="${emoji.nome}">`);
+                }
+            });
+
+            bioHTML = bioHTML.replace(/\n/g, '<br>');
+            document.getElementById('p-bio-' + blockNum).innerHTML = bioHTML;
+
+            const activeProfileType = localStorage.getItem('active_profile_type') || '1';
+            if (parseInt(activeProfileType) === blockNum) {
+                document.getElementById('sidebar-username').innerText = nameValue;
+            }
+            if(!isSilent) document.getElementById('save-bar').style.display = 'flex';
+        }
+
+        function handleImageUpload(input, blockNum, elementTarget) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileName = file.name.toLowerCase();
+                if (blockNum === 1 && fileName.endsWith('.gif')) {
+                    showNotification('Errore: La sezione "Senza AISOS" non supporta GIF animate.', 'error');
+                    input.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => { applyImageData(e.target.result, blockNum, elementTarget); };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyImageData(data, blockNum, target) {
+            if (target === 'avatar') {
+                document.getElementById('in-avatar-' + blockNum).src = data;
+                document.getElementById('p-avatar-' + blockNum).src = data;
+                if (blockNum === 1) tempAvatar1 = data;
+                if (blockNum === 2) tempAvatar2 = data;
+                const activeProfileType = localStorage.getItem('active_profile_type') || '1';
+                if (parseInt(activeProfileType) === blockNum) {
+                    document.getElementById('sidebar-avatar').src = data;
+                    localStorage.setItem('global_active_avatar', data);
+                }
+            } else if (target === 'banner' && blockNum === 2) {
+                document.getElementById('banner-display-2').style.backgroundImage = `url('${data}')`;
+                document.getElementById('p-banner-2').style.backgroundImage = `url('${data}')`;
+                tempBanner2 = data;
+            }
+            document.getElementById('save-bar').style.display = 'flex';
+        }
+
+        function impostaProfilo(tipo) {
+            if (tipo === 2) {
+                const subStatus = localStorage.getItem('acrox_subscription');
+                if (subStatus !== 'attivo') {
+                    showNotification('Impossibile impostare: l\'abbonamento AISOS non è attivo!', 'error');
+                    return;
+                }
+            }
+
+            if (calcolaLunghezzaBio(document.getElementById('in-bio-' + tipo).value) > 143) {
+                showNotification('Impossibile salvare: la bio supera il limite massimo di 143 caratteri.', 'error');
+                return;
+            }
+
+            localStorage.setItem('active_profile_type', tipo);
+            const nameValue = document.getElementById('in-name-' + tipo).value || 'Nome Utente';
+            localStorage.setItem('global_active_username', nameValue);
+            localStorage.setItem('global_active_userId', document.getElementById('in-user-' + tipo).value || "nomeutente");
+            localStorage.setItem('global_active_pronouns', document.getElementById('in-pro-' + tipo).value || "");
+            localStorage.setItem('global_active_bio', document.getElementById('in-bio-' + tipo).value || "");
+            
+            if (tipo === 1) {
+                localStorage.setItem('global_active_banner', document.getElementById('p-banner-1').style.backgroundColor || "#333");
+                localStorage.removeItem('global_aisos_bg');
+            } else {
+                localStorage.setItem('global_active_banner', tempBanner2 ? `url('${tempBanner2}')` : "none");
+                const c1 = document.getElementById('picker-1').value;
+                const c2 = document.getElementById('picker-2').value;
+                localStorage.setItem('global_aisos_bg', `linear-gradient(180deg, ${c1} 0%, ${c2} 100%)`);
+                localStorage.setItem('saved_mix_c1', c1);
+                localStorage.setItem('saved_mix_c2', c2);
+            }
+            
+            const avatarValue = document.getElementById('p-avatar-' + tipo).src;
+            localStorage.setItem('global_active_avatar', avatarValue);
+            document.getElementById('sidebar-avatar').src = avatarValue;
+            document.getElementById('sidebar-username').innerText = nameValue;
+            updateVisualSelectedProfile(tipo);
+            showNotification('Profilo salvato e applicato globalmente!');
+        }
+
+        function updateVisualSelectedProfile(activeType) {
+            document.getElementById('card-block-1').classList.remove('active-profile');
+            document.getElementById('card-block-2').classList.remove('active-profile');
+            document.getElementById('btn-set-1').classList.remove('current-active');
+            document.getElementById('btn-set-2').classList.remove('current-active');
+            document.getElementById('btn-set-1').innerText = "Imposta";
+            document.getElementById('btn-set-2').innerText = "Imposta";
+            document.getElementById('card-block-' + activeType).classList.add('active-profile');
+            document.getElementById('btn-set-' + activeType).classList.add('current-active');
+            document.getElementById('btn-set-' + activeType).innerText = "Attivo";
+        }
+
+        function saveData() {
+            if (calcolaLunghezzaBio(document.getElementById('in-bio-1').value) > 143 || calcolaLunghezzaBio(document.getElementById('in-bio-2').value) > 143) {
+                showNotification('Errore di validazione: una delle biografie supera la soglia di 143.', 'error');
+                return;
+            }
+
+            localStorage.setItem('username_1', document.getElementById('in-name-1').value);
+            localStorage.setItem('userId_1', document.getElementById('in-user-1').value);
+            localStorage.setItem('pronouns_1', document.getElementById('in-pro-1').value);
+            localStorage.setItem('userBio_1', document.getElementById('in-bio-1').value);
+            localStorage.setItem('bannerColor_1', document.getElementById('p-banner-1').style.backgroundColor);
+            if (tempAvatar1) localStorage.setItem('profileImage_1', tempAvatar1);
+
+            localStorage.setItem('username_2', document.getElementById('in-name-2').value);
+            localStorage.setItem('userId_2', document.getElementById('in-user-2').value);
+            localStorage.setItem('pronouns_2', document.getElementById('in-pro-2').value);
+            localStorage.setItem('userBio_2', document.getElementById('in-bio-2').value);
+            if (tempBanner2) localStorage.setItem('bannerImage_2', tempBanner2);
+            if (tempAvatar2) localStorage.setItem('profileImage_2', tempAvatar2);
+            
+            localStorage.setItem('saved_mix_c1', document.getElementById('picker-1').value);
+            localStorage.setItem('saved_mix_c2', document.getElementById('picker-2').value);
+
+            const currentActive = localStorage.getItem('active_profile_type') || '1';
+            impostaProfilo(parseInt(currentActive));
+            document.getElementById('save-bar').style.display = 'none';
+            showNotification('Tutte le modifiche sono state salvate con successo!');
+        }
+
+        function ripristinaDatiSenzaScroll() {
+            loadAllDataFromStorage();
+            document.getElementById('save-bar').style.display = 'none';
+            showNotification('Modifiche non salvate annullate!', 'error');
+        }
+
+        function loadAllDataFromStorage() {
+            document.getElementById('in-name-1').value = localStorage.getItem('username_1') || "";
+            document.getElementById('in-user-1').value = localStorage.getItem('userId_1') || "";
+            document.getElementById('in-pro-1').value = localStorage.getItem('pronouns_1') || "";
+            document.getElementById('in-bio-1').value = localStorage.getItem('userBio_1') || "";
+            const bc1 = localStorage.getItem('bannerColor_1') || "#333";
+            changeBannerColor(bc1, 1, true);
+            
+            const avatar1 = localStorage.getItem('profileImage_1') || "Images/acrox_profile.png";
+            document.getElementById('in-avatar-1').src = avatar1;
+            document.getElementById('p-avatar-1').src = avatar1;
+            tempAvatar1 = localStorage.getItem('profileImage_1');
+
+            document.getElementById('in-name-2').value = localStorage.getItem('username_2') || "";
+            document.getElementById('in-user-2').value = localStorage.getItem('userId_2') || "";
+            document.getElementById('in-pro-2').value = localStorage.getItem('pronouns_2') || "";
+            document.getElementById('in-bio-2').value = localStorage.getItem('userBio_2') || "";
+            
+            const avatar2 = localStorage.getItem('profileImage_2') || "Images/acrox_profile.png";
+            document.getElementById('in-avatar-2').src = avatar2;
+            document.getElementById('p-avatar-2').src = avatar2;
+            tempAvatar2 = localStorage.getItem('profileImage_2');
+
+            const banner2 = localStorage.getItem('bannerImage_2');
+            if(banner2) {
+                document.getElementById('banner-display-2').style.backgroundImage = `url('${banner2}')`;
+                document.getElementById('p-banner-2').style.backgroundImage = `url('${banner2}')`;
+                tempBanner2 = banner2;
+            } else {
+                document.getElementById('banner-display-2').style.backgroundImage = 'none';
+                document.getElementById('p-banner-2').style.backgroundImage = 'none';
+                tempBanner2 = null;
+            }
+
+            document.getElementById('picker-1').value = localStorage.getItem('saved_mix_c1') || "#7289da";
+            document.getElementById('picker-2').value = localStorage.getItem('saved_mix_c2') || "#2c2f33";
+            updateLiveMixColor(true);
+
+            updatePreview(1, true);
+            updatePreview(2, true);
+
+            const activeProfileType = localStorage.getItem('active_profile_type') || '1';
+            updateVisualSelectedProfile(parseInt(activeProfileType));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllDataFromStorage();
+            
+            const globalUsername = localStorage.getItem('global_active_username') || 'Nome Utente';
+            const globalAvatar = localStorage.getItem('global_active_avatar') || 'Images/acrox_profile.png';
+            document.getElementById('sidebar-username').innerText = globalUsername;
+            document.getElementById('sidebar-avatar').src = globalAvatar;
+
+            document.body.style.opacity = '1';
+        });
+
+    </script>
+</body>
+</html>

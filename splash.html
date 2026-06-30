@@ -1,34 +1,30 @@
-<!DOCTYPE html>
-<html lang="it">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Splash ACROX</title>
+<meta charset="utf-8">
 <style>
-  body {
-    margin: 0;
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-
-  img {
-    width: 150px;       /* più piccola */
-    height: 150px;
-    border-radius: 50%; /* rotonda */
-    opacity: 0;
-    animation: fadeIn 3s forwards;
-  }
-
-  @keyframes fadeIn {
-    0% { opacity: 0; transform: scale(0.8);}
-    100% { opacity: 1; transform: scale(1);}
-  }
+body {
+  background: transparent;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+img {
+  width: 120px;
+  opacity: 0;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+@keyframes fadeInOut {
+  0% {opacity: 0; transform: scale(0.8);}
+  30% {opacity: 1; transform: scale(1);}
+  70% {opacity: 1; transform: scale(1);}
+  100% {opacity: 0; transform: scale(0.9);}
+}
 </style>
 </head>
 <body>
-  <img src="acrox.gif" alt="ACROX">
-  <audio src="audio.mp3" autoplay></audio>
+  <img src="icon.ico" alt="Logo">
 </body>
 </html>
