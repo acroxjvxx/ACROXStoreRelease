@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ACROX Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="JavaScript/Theme/theme.js" defer></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fredoka', sans-serif; user-select: none; }
+        body { height: 100vh; display: flex; overflow: hidden; transition: background 0.5s ease; color: white; }
+
+        /* Stile Scrollbar Personalizzata */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+
+        /* Sidebar */
+        nav { width: 280px; height: 100vh; background: rgba(0,0,0,0.15); backdrop-filter: blur(15px); display: flex; flex-direction: column; padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .nav-items { flex-grow: 1; display: flex; flex-direction: column; gap: 12px; }
+        .nav-icon { width: 100%; height: 50px; border-radius: 12px; background: rgba(255,255,255,0.06); display: flex; align-items: center; padding-left: 20px; cursor: pointer; color: white; transition: 0.3s; font-weight: 600; }
+        .nav-icon:hover { background: rgba(255,255,255,0.15); }
+        .nav-icon.active { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* Area Principale Modulare */
+        .main-container { flex-grow: 1; height: 100vh; overflow-y: auto; padding: 40px; }
+
+        /* Mini Player Musicale sopra il profilo */
+        .mini-player-container { width: 100%; display: none; align-items: center; justify-content: space-between; background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 10px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .player-info-block { display: flex; align-items: center; gap: 10px; flex-grow: 1; min-width: 0; }
+        .player-mini-cover { width: 40px; height: 40px; border-radius: 6px; background-size: cover; background-position: center; flex-shrink: 0; cursor: pointer; transition: transform 0.2s ease; }
+        .player-mini-cover:hover { transform: scale(1.05); }
+        .player-text-block { display: flex; flex-direction: column; min-width: 0; }
+        .player-mini-title { font-size: 13px; color: white; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .player-mini-status { font-size: 10px; color: #57f287; font-weight: 600; opacity: 0.9; }
+
+        /* Pannello Utente - Area Profilo Separata */
+        .user-container { width: 100%; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px; position: relative; }
+        .profile-trigger { display: flex; align-items: center; gap: 10px; flex-grow: 1; min-width: 0; cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; }
+        .profile-trigger:hover { background: rgba(255,255,255,0.1); }
+        
+        .avatar { width: 40px; height: 40px; border-radius: 8px; background: #805ad5; flex-shrink: 0; background-position: center; background-size: cover; }
+        .user-text { font-size: 14px; color: white; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-grow: 1; min-width: 0; }
+        
+        /* Controlli isolati */
+        .panel-controls { display: flex; gap: 4px; color: white; flex-shrink: 0; align-items: center; }
+        .control-btn { cursor: pointer; padding: 6px; opacity: 0.8; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center; position: relative; }
+        .control-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+        .control-btn img { width: 16px; height: 16px; object-fit: contain; filter: invert(1) brightness(2); }
+
+        .control-btn.disattivato::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: linear-gradient(135deg, transparent 43%, #ff3b30 46%, #ff3b30 54%, transparent 57%);
+            pointer-events: none;
+            filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.4));
+        }
+
+        /* Popup Profilo */
+        .profile-popup { display: none; position: absolute; bottom: 100px; left: 10px; width: 445px; height: 600px; background: #1e1f22; border-radius: 14px; padding: 0 0 15px 0; z-index: 1000; box-shadow: 0 12px 40px rgba(0,0,0,0.6); color: white; border: 1px solid #111112; overflow: hidden; transition: background 0.3s ease; flex-direction: column; }
+        .popup-banner { height: 160px; background: #805ad5; transition: background 0.3s ease; width: 100%; position: relative; flex-shrink: 0; background-position: center center !important; background-size: cover !important; background-repeat: no-repeat !important; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+        .popup-avatar { width: 95px; height: 100px; border-radius: 50%; border: 6px solid #1e1f22; position: absolute; top: 95px; left: 15px; background: #805ad5; background-position: center; background-size: cover; transition: border-color 0.3s ease; }
+        .popup-body { padding: 54px 16px 15px 16px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; position: relative; }
+        
+        .name-container { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .popup-pronouns { font-size: 12px; background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; color: #b5bac1; font-weight: 600; display: none; }
+        .profile-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #b5bac1; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .profile-value { font-size: 14px; color: #dbdee1; word-wrap: break-word; white-space: pre-wrap; line-height: 1.4; max-height: 150px; overflow-y: auto; }
+        .profile-value .bio-custom-emoji { width: 22px; height: 22px; object-fit: contain; vertical-align: bottom; display: inline-block; margin: 0 2px; }
+
+        .test-clear-btn { align-self: flex-end; margin-top: auto; margin-bottom: 4px; padding: 6px 12px; background: #e67e22; color: white; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+        .test-clear-btn:hover { background: #d35400; }
+        .popup-action-btn { width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(255,255,255,0.06); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .popup-action-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+
+        /* AGGIUNTA REGOLA CSS PER IL CUORE ROSSO DEI PREFERITI */
+        .favorite-heart-btn.is-fav {
+            color: #f43f5e !important;
+            background: rgba(244, 63, 94, 0.15) !important;
+            border-color: rgba(244, 63, 94, 0.3) !important;
+            text-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-items">
+            <div id="menu-home" class="nav-icon active" onclick="switchView('home', 'Files/Home/home.txt')">🏠 Home</div>
+            <div id="menu-chat" class="nav-icon" onclick="switchView('chat', 'Files/Chat/chat.txt')">🗨️ Chat</div>
+            <div id="menu-games" class="nav-icon" onclick="switchView('games', 'Files/Games/games.txt')">🎮 Giochi</div>
+        </div>
+
+        <div class="mini-player-container" id="mini-player">
+            <div class="player-info-block">
+                <div class="player-mini-cover" id="mini-player-cover" onclick="apriMusicaSettings()" style="background-image: url('https://placehold.co/150x150/ffffff/000000?text=Audio');" title="Apri impostazioni musica"></div>
+                <div class="player-text-block">
+                    <span class="player-mini-title" id="mini-player-title">Nessun brano</span>
+                    <span class="player-mini-status" id="mini-player-status">In pausa</span>
+                </div>
+            </div>
+            <div class="panel-controls">
+                <div class="control-btn" title="Brano Precedente" id="mini-btn-prev">
+                    <img src="Images/backward.png" alt="Back">
+                </div>
+                <div class="control-btn" title="Riproduci/Pausa" id="mini-btn-play">
+                    <img id="mini-img-play" src="Images/play.png" alt="Play/Pause">
+                </div>
+                <div class="control-btn" title="Prossimo Brano" id="mini-btn-next">
+                    <img src="Images/skip-button.png" alt="Skip">
+                </div>
+            </div>
+        </div>
+
+        <div class="user-container">
+            <div class="profile-trigger" id="profile-trigger">
+                <div class="avatar" id="avatar"></div>
+                <div class="user-text" id="user-name">Acrox</div>
+            </div>
+            <div class="panel-controls">
+                <div id="btn-mic" class="control-btn" title="Microfono" onclick="toggleMic()">
+                    <img id="img-mic" src="Images/Microfone_On.png" alt="Microfono">
+                </div>
+                <div id="btn-headphones" class="control-btn" title="Cuffie" onclick="toggleHeadphones()">
+                    <img id="img-headphones" src="Images/Cuffie_On.png" alt="Cuffie">
+                </div>
+                <div class="control-btn" title="Impostazioni" onclick="window.location.href='profile.html'">
+                    <img src="Images/Settings.png" alt="Impostazioni">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container" id="main-content-wrapper"></div>
+
+    <div id="profile-popup" class="profile-popup">
+        <div class="popup-banner" id="popup-banner">
+            <div class="popup-avatar" id="popup-avatar"></div>
+        </div>
+        <div class="popup-body">
+            <div>
+                <div class="name-container">
+                    <h2 id="popup-username" style="font-size: 20px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">Acrox</h2>
+                    <span id="popup-pronouns" class="popup-pronouns"></span>
+                </div>
+                <div id="popup-userid" style="font-size: 13px; color: #b5bac1; margin-top: 2px;">@acrox</div>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 5px 0;">
+            <div>
+                <div class="profile-label">Biografia</div>
+                <p id="popup-bio" class="profile-value">La mia bio personalizzata.</p>
+            </div>
+            <button class="test-clear-btn" onclick="eseguiWipeTest()">⚠️ Reset Cache (Wipe)</button>
+            <button class="popup-action-btn" onclick="window.location.href='profilecustom.html'">Modifica profilo</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let isMicOn = localStorage.getItem('acrox_mic_on') !== 'false';
+        let isHeadphonesOn = localStorage.getItem('acrox_headphones_on') !== 'false';
+
+        function applicaStatoInizialeAudio() {
+            const micImg = document.getElementById('img-mic');
+            const micBtn = document.getElementById('btn-mic');
+            const headphonesImg = document.getElementById('img-headphones');
+            const headphonesBtn = document.getElementById('btn-headphones');
+
+            if (micImg && micBtn) {
+                if (isMicOn) {
+                    micImg.src = 'Images/Microfone_On.png';
+                    micBtn.classList.remove('disattivato');
+                } else {
+                    micImg.src = 'Images/Microfone_Off.png';
+                    micBtn.classList.add('disattivato');
+                }
+            }
+
+            if (headphonesImg && headphonesBtn) {
+                if (isHeadphonesOn) {
+                    headphonesImg.src = 'Images/Cuffie_On.png';
+                    headphonesBtn.classList.remove('disattivato');
+                } else {
+                    headphonesImg.src = 'Images/Cuffie_Off.png';
+                    headphonesBtn.classList.add('disattivato');
+                }
+            }
+        }
+
+        function toggleMic() {
+            const micImg = document.getElementById('img-mic');
+            const micBtn = document.getElementById('btn-mic');
+            if (isMicOn) {
+                micImg.src = 'Images/Microfone_Off.png';
+                micBtn.classList.add('disattivato');
+                localStorage.setItem('acrox_mic_on', 'false');
+            } else {
+                micImg.src = 'Images/Microfone_On.png';
+                micBtn.classList.remove('disattivato');
+                localStorage.setItem('acrox_mic_on', 'true');
+            }
+            isMicOn = !isMicOn;
+        }
+
+        function toggleHeadphones() {
+            const headphonesImg = document.getElementById('img-headphones');
+            const headphonesBtn = document.getElementById('btn-headphones');
+            if (isHeadphonesOn) {
+                headphonesImg.src = 'Images/Cuffie_Off.png';
+                headphonesBtn.classList.add('disattivato');
+                localStorage.setItem('acrox_headphones_on', 'false');
+            } else {
+                headphonesImg.src = 'Images/Cuffie_On.png';
+                headphonesBtn.classList.remove('disattivato');
+                localStorage.setItem('acrox_headphones_on', 'true');
+            }
+            isHeadphonesOn = !isHeadphonesOn;
+        }
+
+        // FUNZIONE SWITCHVIEW CORRETTA PER INIZIALIZZARE I PREFERITI DOPO IL CARICAMENTO
+        async function switchView(viewName, filePath) {
+            const container = document.getElementById('main-content-wrapper');
+            if (!container) return;
+
+            try {
+                const response = await fetch(filePath);
+                if (response.ok) {
+                    let htmlContent = await response.text();
+                    container.innerHTML = htmlContent;
+
+                    const scripts = container.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        if (oldScript.src) {
+                            newScript.src = oldScript.src;
+                        } else {
+                            newScript.textContent = oldScript.textContent;
+                        }
+                        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                    });
+
+                    // CORREZIONE FONDAMENTALE: Se carichiamo la sezione 'games', analizziamo subito i preferiti salvati!
+                    if (viewName === 'games') {
+                        analizzaPreferitiAlAvvio();
+                    }
+
+                } else {
+                    container.innerHTML = `<p style="color:red; padding:20px;">Errore nel caricamento del modulo: ${response.statusText}</p>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<p style="color:red; padding:20px;">Errore di rete durante il caricamento di ${filePath}.</p>`;
+            }
+
+            document.querySelectorAll('.nav-icon').forEach(btn => btn.classList.remove('active'));
+            const activeMenu = document.getElementById(`menu-${viewName}`);
+            if (activeMenu) activeMenu.classList.add('active');
+        }
+
+        function apriMusicaSettings() { window.location.href = 'Settings.html?tab=musica'; }
+        function eseguiWipeTest() { localStorage.clear(); window.location.href = 'account.html'; }
+        function escapeHTML(str) { return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+
+        function caricaDatiProfilo() {
+            const globalUsername = localStorage.getItem('global_active_username') || "Acrox";
+            const globalAvatar = localStorage.getItem('global_active_avatar') || "Images/acrox_profile.png";
+            const globalBio = localStorage.getItem('global_active_bio') || "Nessuna biografia inserita.";
+            const globalBanner = localStorage.getItem('global_active_banner') || "#805ad5";
+            const defaultId = globalUsername.toLowerCase().replace(/\s+/g, '');
+            const globalUserId = localStorage.getItem('global_active_userId') || defaultId;
+            const globalPronouns = localStorage.getItem('global_active_pronouns') || "";
+            const globalAisosBg = localStorage.getItem('global_aisos_bg');
+            const savedC1 = localStorage.getItem('saved_mix_c1') || '#1e1f22';
+
+            document.getElementById('user-name').textContent = globalUsername;
+            document.getElementById('popup-username').textContent = globalUsername;
+            document.getElementById('popup-userid').textContent = `@${globalUserId}`;
+            
+            let bioHTML = escapeHTML(globalBio);
+            const emojiSalvate = JSON.parse(localStorage.getItem('acrox_emoji_list')) || [];
+            emojiSalvate.forEach(emoji => {
+                if (emoji.nome && emoji.src) {
+                    const regex = new RegExp(emoji.nome.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                    bioHTML = bioHTML.replace(regex, `<img src="${emoji.src}" class="bio-custom-emoji" alt="${emoji.nome}" title="${emoji.nome}">`);
+                }
+            });
+            bioHTML = bioHTML.replace(/\n/g, '<br>');
+            document.getElementById('popup-bio').innerHTML = bioHTML;
+            
+            const bannerEl = document.getElementById('popup-banner');
+            if (globalBanner.startsWith('#') || globalBanner.startsWith('rgb') || globalBanner.startsWith('linear-gradient')) {
+                bannerEl.style.background = globalBanner;
+            } else {
+                bannerEl.style.background = globalBanner.includes('url(') ? globalBanner : `url('${globalBanner}')`;
+            }
+            bannerEl.style.backgroundSize = "cover"; bannerEl.style.backgroundPosition = "center center"; bannerEl.style.backgroundRepeat = "no-repeat";
+
+            const popupEl = document.getElementById('profile-popup');
+            const popupAvatarEl = document.getElementById('popup-avatar');
+            if (globalAisosBg) { popupEl.style.background = globalAisosBg; popupAvatarEl.style.borderColor = savedC1; } 
+            else { popupEl.style.background = "#1e1f22"; popupAvatarEl.style.borderColor = "#1e1f22"; }
+
+            const pronounsEl = document.getElementById('popup-pronouns');
+            if (globalPronouns.trim() !== "" && globalPronouns !== "Non specificati") { pronounsEl.textContent = globalPronouns; pronounsEl.style.display = "inline-block"; } 
+            else { pronounsEl.style.display = "none"; pronounsEl.textContent = ""; }
+
+            document.getElementById('avatar').style.backgroundImage = `url('${globalAvatar}')`;
+            popupAvatarEl.style.backgroundImage = `url('${globalAvatar}')`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('user_logged_in') !== 'true') { window.location.href = 'account.html'; return; }
+            caricaDatiProfilo();
+            applicaStatoInizialeAudio();
+
+            switchView('home', 'Files/Home/home.txt');
+
+            const trigger = document.getElementById('profile-trigger');
+            const popup = document.getElementById('profile-popup');
+
+            trigger.addEventListener('click', (e) => { e.stopPropagation(); popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex'; });
+            popup.addEventListener('click', (e) => { e.stopPropagation(); });
+            window.addEventListener('click', () => { popup.style.display = 'none'; });
+
+            if (document.getElementById('mini-btn-play')) document.getElementById('mini-btn-play').onclick = () => ipcRenderer.send('music-command', { action: 'play-pause' });
+            if (document.getElementById('mini-btn-prev')) document.getElementById('mini-btn-prev').onclick = () => ipcRenderer.send('music-command', { action: 'prev' });
+            if (document.getElementById('mini-btn-next')) document.getElementById('mini-btn-next').onclick = () => ipcRenderer.send('music-command', { action: 'next' });
+
+            ipcRenderer.send('music-command', { action: 'request-sync' });
+        });
+
+        ipcRenderer.on('sync-ui-status', (event, data) => {
+            if (data.type === 'trackchange') {
+                if (document.getElementById('mini-player')) document.getElementById('mini-player').style.display = 'flex';
+                if (document.getElementById('mini-player-title')) document.getElementById('mini-player-title').innerText = data.title;
+                if (document.getElementById('mini-player-cover')) document.getElementById('mini-player-cover').style.backgroundImage = `url('${data.coverSrc}')`;
+                if (document.getElementById('mini-img-play')) document.getElementById('mini-img-play').src = data.paused ? 'Images/play.png' : 'Images/pause.png';
+                if (document.getElementById('mini-player-status')) {
+                    document.getElementById('mini-player-status').innerText = data.paused ? 'In pausa' : 'In riproduzione';
+                    document.getElementById('mini-player-status').style.color = data.paused ? '#b5bac1' : '#57f287';
+                }
+            }
+        });
+
+    let activeCategory = 'all';
+    let filterOnlyFavorites = false;
+
+    // LOGICA GESTIONE GIOCHI E PREFERITI
+    function analizzaPreferitiAlAvvio() {
+        const savedFavorites = JSON.parse(localStorage.getItem('acrox_game_favorites')) || [];
+        document.querySelectorAll('.game-card').forEach(card => {
+            const gameId = card.getAttribute('data-id');
+            const heartBtn = card.querySelector('.favorite-heart-btn');
+            if (heartBtn) {
+                if (savedFavorites.includes(gameId)) {
+                    heartBtn.classList.add('is-fav');
+                } else {
+                    heartBtn.classList.remove('is-fav');
+                }
+            }
+        });
+    }
+
+    function goHome(event) {
+        event.stopPropagation();
+        
+        filterOnlyFavorites = false;
+        const favToggleBtn = document.getElementById('menu-fav-toggle');
+        if (favToggleBtn) {
+            favToggleBtn.classList.remove('active-filter');
+            favToggleBtn.innerHTML = "⭐ Preferiti";
+        }
+
+        activeCategory = 'all';
+        const triggerBtn = document.getElementById('category-trigger');
+        if (triggerBtn) triggerBtn.innerHTML = `📂 Tutti i giochi <span class="arrow" id="category-arrow">▼</span>`;
+        document.querySelectorAll('.category-item').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.textContent === 'Tutti i giochi') btn.classList.add('active');
+        });
+
+        if(document.getElementById('game-search-input')) document.getElementById('game-search-input').value = '';
+
+        chiudiSectionsMenu();
+        filterGames();
+        showTopPopup("🏠 Sei tornato alla Home");
+    }
+
+    function toggleFavorite(gameId, gameName, event) {
+        event.stopPropagation();
+        let savedFavorites = JSON.parse(localStorage.getItem('acrox_game_favorites')) || [];
+        const heartBtn = event.currentTarget;
+        let msg = "";
+
+        if (savedFavorites.includes(gameId)) {
+            savedFavorites = savedFavorites.filter(id => id !== gameId);
+            heartBtn.classList.remove('is-fav');
+            msg = `💔 Hai rimosso "${gameName}" dai preferiti`;
+        } else {
+            savedFavorites.push(gameId);
+            heartBtn.classList.add('is-fav');
+            msg = `💖 Hai aggiunto "${gameName}" ai preferiti`;
+        }
+
+        localStorage.setItem('acrox_game_favorites', JSON.stringify(savedFavorites));
+        showTopPopup(msg);
+
+        if (filterOnlyFavorites) {
+            filterGames();
+        }
+    }
+
+    function showTopPopup(message) {
+        const topToast = document.getElementById('top-toast');
+        if(topToast) {
+            topToast.innerHTML = message;
+            topToast.classList.add('show');
+            setTimeout(() => { topToast.classList.remove('show'); }, 2500);
+        }
+    }
+
+    function toggleFavoritesFilter(event) {
+        event.stopPropagation();
+        filterOnlyFavorites = !filterOnlyFavorites;
+        
+        const favToggleBtn = document.getElementById('menu-fav-toggle');
+        if (filterOnlyFavorites) {
+            favToggleBtn.classList.add('active-filter');
+            favToggleBtn.innerHTML = "⭐ Mostrando Preferiti";
+        } else {
+            favToggleBtn.classList.remove('active-filter');
+            favToggleBtn.innerHTML = "⭐ Preferiti";
+        }
+
+        chiudiSectionsMenu();
+        filterGames();
+    }
+
+    function toggleSectionsMenu(event) {
+        event.stopPropagation();
+        chiudiMenu(); 
+        
+        const menu = document.getElementById('sections-menu');
+        const btn = document.getElementById('hamburger-btn');
+        
+        if (menu && menu.classList.contains('show')) {
+            chiudiSectionsMenu();
+        } else if(menu && btn) {
+            btn.classList.add('active'); 
+            menu.style.display = 'flex';
+            setTimeout(() => { menu.classList.add('show'); }, 10);
+        }
+    }
+
+    function chiudiSectionsMenu() {
+        const menu = document.getElementById('sections-menu');
+        const btn = document.getElementById('hamburger-btn');
+        if (btn) btn.classList.remove('active'); 
+        if (menu && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            setTimeout(() => { menu.style.display = 'none'; }, 180);
+        }
+    }
+
+    function changeSection(sectionName, event) {
+        event.stopPropagation();
+        if (sectionName === 'admin') {
+            chiudiSectionsMenu();
+            openPasswordModal();
+            return;
+        }
+        console.log("Navigazione su: " + sectionName);
+        chiudiSectionsMenu();
+    }
+
+    // MODALE ADMIN PASSWORD
+    function openPasswordModal() {
+        const modal = document.getElementById('password-modal');
+        const input = document.getElementById('admin-password-field');
+        if(modal && input) {
+            input.value = '';
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.classList.add('show'); input.focus(); }, 10);
+        }
+    }
+
+    function closePasswordModal() {
+        const modal = document.getElementById('password-modal');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 180);
+        }
+    }
+
+    function verifyAdminPassword() {
+        const passwordInput = document.getElementById('admin-password-field').value;
+        if (passwordInput === "Acrox&Aisos_CMD") {
+            showTopPopup("✅ Accesso Amministratore Consentito!");
+            closePasswordModal();
+        } else {
+            showTopPopup("❌ Password Errata. Accesso Negato.");
+        }
+    }
+
+    function toggleCategoryMenu(event) {
+        event.stopPropagation();
+        chiudiSectionsMenu(); 
+        
+        const menu = document.getElementById('category-menu');
+        const arrow = document.getElementById('category-arrow');
+        
+        if (menu && menu.classList.contains('show')) {
+            chiudiMenu();
+        } else if(menu) {
+            menu.style.display = 'flex';
+            setTimeout(() => {
+                menu.classList.add('show');
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
+            }, 10);
+        }
+    }
+
+    function chiudiMenu() {
+        const menu = document.getElementById('category-menu');
+        const arrow = document.getElementById('category-arrow');
+        if (menu && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+            setTimeout(() => { menu.style.display = 'none'; }, 180);
+        }
+    }
+
+    function filterCategory(category, buttonElement, categoryName) {
+        activeCategory = category;
+        document.querySelectorAll('.category-item').forEach(btn => btn.classList.remove('active'));
+        buttonElement.classList.add('active');
+        
+        const triggerBtn = document.getElementById('category-trigger');
+        if(triggerBtn) triggerBtn.innerHTML = `📂 ${categoryName} <span class="arrow" id="category-arrow">▼</span>`;
+        
+        chiudiMenu();
+        filterGames();
+    }
+
+    function filterGames() {
+        const searchInput = document.getElementById('game-search-input');
+        const query = searchInput ? searchInput.value.toLowerCase() : '';
+        const cards = document.querySelectorAll('.game-card');
+        const savedFavorites = JSON.parse(localStorage.getItem('acrox_game_favorites')) || [];
+
+        cards.forEach(card => {
+            const gameName = card.getAttribute('data-name').toLowerCase();
+            const gameId = card.getAttribute('data-id');
+            const gameCategories = card.getAttribute('data-category') ? card.getAttribute('data-category').split(' ') : [];
+            
+            const matchesSearch = gameName.includes(query);
+            const matchesCategory = (activeCategory === 'all' || gameCategories.includes(activeCategory));
+            const matchesFavorites = !filterOnlyFavorites || savedFavorites.includes(gameId);
+
+            if (matchesSearch && matchesCategory && matchesFavorites) {
+                card.style.display = "flex";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    function iaClickAction(event) {
+        event.stopPropagation();
+        console.log("IA Core Attiva.");
+    }
+
+    window.addEventListener('click', () => {
+        chiudiMenu();
+        chiudiSectionsMenu();
+    });
+
+    // Delegazione dell'evento keydown nel caso in cui l'input della password venga renderizzato successivamente
+    document.addEventListener('keydown', function(e) {
+        if (e.target && e.target.id === 'admin-password-field' && e.key === 'Enter') {
+            verifyAdminPassword();
+        }
+    });
+// FUNZIONE DI NAVIGAZIONE CORRETTA LEGATA A INDEX.HTML / GAMES.TXT
+    function tornaAGamesLista(event) {
+        event.stopPropagation();
+        
+        // 1. Prova a usare la funzione globale switchView se definita in index.html
+        if (typeof switchView === 'function') {
+            switchView('games', 'Files/Games/games.txt');
+        } 
+        // 2. Prova se la pagina è dentro un iframe (window.parent)
+        else if (window.parent && typeof window.parent.switchView === 'function') {
+            window.parent.switchView('games', 'Files/Games/games.txt');
+        } 
+        // 3. Fallback: se non trova switchView, esegue il fetch diretto.
+        // NOTA: Se MECCHA CHAMELEON.html è dentro "Files/Games/", il percorso per raggiungere games.txt è semplicemente 'games.txt' o '../Games/games.txt'
+        else {
+            console.log("Navigazione di fallback a games.txt");
+            
+            // Cerca il contenitore principale dove iniettare il codice
+            const mainContent = document.getElementById('main-content-wrapper') || 
+                                 (window.parent && window.parent.document.getElementById('main-content-wrapper')) || 
+                                 document.body;
+            
+            // Modifica questo percorso se games.txt non viene trovato (es. 'games.txt' se sono nella stessa cartella)
+            const percorsoGames = 'Files/Games/games.txt'; 
+            
+            fetch(percorsoGames)
+                .then(res => {
+                    if(!res.ok) throw new Error("File non trovato al percorso indicato");
+                    return res.text();
+                })
+                .then(html => {
+                    mainContent.innerHTML = html;
+                    if(typeof analizzaPreferitiAlAvvio === 'function') analizzaPreferitiAlAvvio();
+                    if(window.parent && typeof window.parent.analizzaPreferitiAlAvvio === 'function') window.parent.analizzaPreferitiAlAvvio();
+                })
+                .catch(err => {
+                    console.error("Errore nel caricamento di Games.txt:", err);
+                    // Tentativo estremo: se non trova il file al percorso sopra, prova a cercarlo nella stessa cartella
+                    fetch('games.txt')
+                        .then(res => res.text())
+                        .then(html => { mainContent.innerHTML = html; });
+                });
+        }
+    }
+
+    </script>
+</body>
+</html>

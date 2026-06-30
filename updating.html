@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Aggiornamento in corso...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="JavaScript/Theme/theme.js" defer></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fredoka', sans-serif; user-select: none; }
+        
+        body { 
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            /* Rimuoviamo il background fisso perché verrà gestito da theme.js */
+            transition: background 0.5s ease;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px; border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center; width: 360px; backdrop-filter: blur(15px);
+            border: 4px solid rgba(255, 255, 255, 0.6);
+        }
+
+        h2 { font-size: 1.8rem; margin-bottom: 20px; color: #3b3b58; }
+
+        .loader {
+            width: 100%; height: 20px; background: #e2e8f0;
+            border-radius: 10px; overflow: hidden; margin-top: 10px;
+        }
+        .loader-inner {
+            height: 100%; width: 0%; border-radius: 10px;
+            background: linear-gradient(45deg, #805ad5, #9f7aea);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .percent {
+            margin-top: 15px; font-size: 1.2rem;
+            color: #805ad5; font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Aggiornamento in corso...</h2>
+    <div class="loader">
+        <div class="loader-inner" id="loader-inner"></div>
+    </div>
+    <div class="percent" id="percent">0%</div>
+</div>
+
+<script>
+    // Codice esistente per Electron
+    const { ipcRenderer } = require('electron');
+    const loader = document.getElementById('loader-inner');
+    const percentText = document.getElementById('percent');
+
+    ipcRenderer.on('download-progress', (event, progress) => {
+        const p = Math.round(progress);
+        loader.style.width = p + '%';
+        percentText.textContent = p + '%';
+    });
+</script>
+
+</body>
+</html>
