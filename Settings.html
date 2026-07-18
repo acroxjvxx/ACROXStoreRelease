@@ -76,7 +76,8 @@
         <div class="nav-item" onclick="window.location.href='profile.html'">← Torna Indietro</div>
        
         <div class="nav-header" style="margin-top:20px;">ALTRO</div>
-        <div id="menu-musica" class="nav-item active" onclick="switchTab('musica', 'Files/Musica.txt')">Musica</div>
+        <div id="menu-musica" class="nav-item active" onclick="switchTab('musica', 'Files/Musica/Musica.txt')">Musica</div>
+        <div id="menu-mechsounds" class="nav-item" onclick="switchTab('mechsounds', 'Files/MechSounds/MechSounds.txt')">MechSounds</div>
 
         <div class="logout-container">
             <button class="logout-btn" onclick="logout()">Disconnettiti</button>
@@ -88,6 +89,13 @@
             <h1>Musica</h1>
             <div class="card">
                 <p style="opacity: 0.7;">Caricamento dei componenti multimediali in corso...</p>
+            </div>
+        </div>
+
+        <div id="tab-mechsounds" class="tab-content">
+            <h1>MechSounds</h1>
+            <div class="card">
+                <p style="opacity: 0.7;">Caricamento dei moduli audio della tastiera in corso...</p>
             </div>
         </div>
     </div>
@@ -151,11 +159,10 @@
 
         // --- STATO DEL PLAYER DELLA CODA LOCALE GRAFICA ---
         let playlist = [];
-        const MAX_TRACKS = 10; // Limite massimo di brani consentiti
-        let isSeeking = false; // Evita conflitti grafici durante il trascinamento della timeline
-        let activeEditAction = ''; // Memorizza l'azione scelta nella modale: 'remove', 'name', 'cover'
+        const MAX_TRACKS = 10;
+        let isSeeking = false;
+        let activeEditAction = '';
 
-        // Notifiche Custom stilizzate dentro la pagina
         function showMusicAlert(text, isError = false) {
             const alertBox = document.getElementById('music-alert');
             if (!alertBox) return;
@@ -173,7 +180,6 @@
             setTimeout(() => { if (alertBox) alertBox.style.display = 'none'; }, 4000);
         }
 
-        // Inizializza i listener per gli elementi inseriti da Musica.txt collegandoli via IPC al background
         function initMusicListeners() {
             const addBtn = document.getElementById('add-track-btn');
             if (addBtn) {
@@ -206,7 +212,6 @@
                         }
                     }
 
-                    // CONTROLLO DEL LIMITE MASSIMO DI 10 BRANI
                     if (playlist.length >= MAX_TRACKS) {
                         showMusicAlert(`Limite raggiunto! Non puoi aggiungere più di ${MAX_TRACKS} brani alla libreria.`, true);
                         return;
@@ -229,7 +234,6 @@
                         if (audioLabel) audioLabel.innerText = 'Scegli o trascina un file audio...';
                         if (coverLabel) coverLabel.innerText = 'Scegli una copertina opzionale...';
                         
-                        // Chiede alla finestra nascosta di aggiornare la sua playlist interna con il nuovo brano
                         ipcRenderer.send('music-command', { action: 'reload-db' });
                         await refreshPlaylistData();
                     } catch (err) {
@@ -238,7 +242,6 @@
                 };
             }
 
-            // CONTROLLI UTENTE INTERFACCIA -> IPC MAIN -> BACKGROUND AUDIO
             const playPauseBtn = document.getElementById('btn-play-pause');
             if (playPauseBtn) {
                 playPauseBtn.onclick = function() {
@@ -260,10 +263,8 @@
                 };
             }
 
-            // Regolazione Volume con ripristino e salvataggio dello stato permanente
             const volumeControl = document.getElementById('volume-control');
             if (volumeControl) {
-                // 🔴 CORRETTO: Ora usa la chiave universale 'saved_music_volume'
                 const savedVolume = localStorage.getItem('saved_music_volume');
                 if (savedVolume !== null) {
                     volumeControl.value = savedVolume;
@@ -273,27 +274,22 @@
 
                 volumeControl.oninput = function() {
                     ipcRenderer.send('music-command', { action: 'volume', value: parseFloat(this.value) });
-                    // 🔴 CORRETTO: Sincronizzato con il file di Background Musica.js
                     localStorage.setItem('saved_music_volume', this.value); 
                     updateVolumeIcon(this.value);
                 };
             }
 
-            // BARRA CARICAMENTO / TIMELINE AVANZAMENTO
             const trackProgress = document.getElementById('track-progress');
             if (trackProgress) {
-                // Quando l'utente trascina la timeline col mouse
                 trackProgress.oninput = function() {
                     isSeeking = true;
                 };
-                // Quando rilascia il click, applica lo spostamento effettivo nel tempo del player
                 trackProgress.onchange = function() {
                     ipcRenderer.send('music-command', { action: 'seek', value: this.value });
                     isSeeking = false;
                 };
             }
 
-            // --- APERTURA FINESTRA MODALE MODIFICA ---
             const editLibBtn = document.getElementById('edit-library-btn');
             if (editLibBtn) {
                 editLibBtn.onclick = function() {
@@ -306,7 +302,6 @@
                 };
             }
 
-            // --- CONFERMA FINALE DELLA MODIFICA / RIMOZIONE SU DB ---
             const confirmEditBtn = document.getElementById('edit-confirm-btn');
             if (confirmEditBtn) {
                 confirmEditBtn.onclick = async function() {
@@ -330,7 +325,6 @@
             }
         }
 
-        // Funzione globale di supporto per aggiornare visivamente l'icona del volume
         function updateVolumeIcon(value) {
             const volumeIcon = document.getElementById('volume-icon');
             if (volumeIcon) {
@@ -341,14 +335,12 @@
             }
         }
 
-        // --- SISTEMA INTERATTIVO DI MODIFICA PASSO-PASSO ---
         window.setEditAction = function(action) {
             activeEditAction = action;
             document.getElementById('edit-step-1').style.display = 'none';
             document.getElementById('edit-step-2').style.display = 'flex';
             document.getElementById('edit-modal-desc').style.display = 'none';
             
-            // Popola il menu a tendina con i brani correnti mantenendo l'ID univoco di IndexedDB
             const select = document.getElementById('edit-track-select');
             select.innerHTML = '';
             playlist.forEach(track => {
@@ -385,8 +377,6 @@
             document.getElementById('edit-music-modal').style.display = 'none';
         };
 
-        // Esegue l'eliminazione fisica del record su IndexedDB
-        // Esegue l'eliminazione fisica del record su IndexedDB
         function executeRemoveTrack(id) {
             return new Promise((resolve) => {
                 const transaction = db.transaction(["tracks"], "readwrite");
@@ -395,16 +385,13 @@
 
                 transaction.oncomplete = async () => {
                     showMusicAlert("Brano rimosso con successo dalla libreria!");
-                    // 🌟 PRIMA aggiorna la lista locale della pagina...
                     await refreshPlaylistData();
-                    // 🌟 POI notifica il background (così la UI è già pronta quando riceve la risposta)
                     ipcRenderer.send('music-command', { action: 'reload-db' });
                     resolve();
                 };
             });
         }
 
-        // Estrae il record, unisce i campi modificati e aggiorna l'object store
         function executeUpdateTrackField(id, updatedFields) {
             return new Promise((resolve) => {
                 const transaction = db.transaction(["tracks"], "readwrite");
@@ -421,16 +408,13 @@
 
                 transaction.oncomplete = async () => {
                     showMusicAlert("Libreria aggiornata con successo!");
-                    // 🌟 Stessa cosa qui: aggiorna prima la UI locale
                     await refreshPlaylistData();
-                    // 🌟 E poi notifica il riproduttore audio di background
                     ipcRenderer.send('music-command', { action: 'reload-db' });
                     resolve();
                 };
             });
         }
 
-        // --- SVUOTA LA VECCHIA CODA ED ESTRAE LE TRACCE DA INDEXEDDB ---
         async function refreshPlaylistData() {
             try {
                 const rawTracks = await loadTracksFromDB();
@@ -455,7 +439,6 @@
             }
         }
 
-        // Genera la lista delle tracce a schermo
         function renderPlaylist(activeTitle = '') {
             const container = document.getElementById('playlist-container');
             const emptyMsg = document.getElementById('empty-playlist-msg');
@@ -524,12 +507,24 @@
                 if(document.getElementById('btn-play-pause')) document.getElementById('btn-play-pause').innerText = data.paused ? '▶' : '⏸';
                 if(document.getElementById('player-status')) document.getElementById('player-status').innerText = data.paused ? 'In pausa' : 'In riproduzione';
                 
+                const btnRepeat = document.getElementById('btn-repeat');
+                if (btnRepeat) {
+                    if (data.repeatActive) {
+                        btnRepeat.classList.add('active');
+                    } else {
+                        btnRepeat.classList.remove('active');
+                    }
+                }
+                
                 renderPlaylist(data.title);
             }
         });
 
         // --- APERTURA TAB ASINCRONA ---
         async function switchTab(tabName, filePath = null) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(el => el.classList.remove('active'));
+
             if (filePath) {
                 try {
                     const response = await fetch(filePath);
@@ -541,17 +536,20 @@
                             initMusicListeners();
                             await refreshPlaylistData();
                             
-                            // Richiede uno stato immediato per popolare i campi grafici se la musica stava già girando
                             ipcRenderer.send('music-command', { action: 'request-sync' });
 
-                            // Forza il riallineamento grafico della levetta del volume appena caricato il modulo HTML
                             const volumeControl = document.getElementById('volume-control');
-                            // 🔴 CORRETTO: Letto dalla chiave corretta
                             const savedVolume = localStorage.getItem('saved_music_volume');
                             if (volumeControl && savedVolume !== null) {
                                 volumeControl.value = savedVolume;
                                 updateVolumeIcon(savedVolume);
                             }
+                        }
+                        
+                        if(tabName === 'mechsounds') {
+                            console.log("Modulo MechSounds caricato con successo!");
+                            // 🖱️ Inizializza l'interattività dei tasti del mouse subito dopo il caricamento del DOM esterno!
+                            initMouseInteractivity();
                         }
                     } else {
                         document.getElementById(`tab-${tabName}`).innerHTML = `<p style="color:red; padding:20px;">Errore nel caricamento del modulo: ${response.statusText}</p>`;
@@ -561,6 +559,9 @@
                 }
             }
 
+            const currentTab = document.getElementById(`tab-${tabName}`);
+            if (currentTab) currentTab.classList.add('active');
+
             const items = document.querySelectorAll('.nav-item');
             items.forEach(el => el.classList.remove('active'));
             
@@ -568,12 +569,10 @@
             if(activeMenu) activeMenu.classList.add('active');
         }
 
-        // Modali Logout
         function logout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function closeLogoutModal() { document.getElementById('logout-modal').style.display = 'none'; }
         function confirmLogout() { localStorage.removeItem('user_logged_in'); window.location.href = 'Account.html'; }
 
-        // Caricamento Iniziale del DOM
         document.addEventListener('DOMContentLoaded', async () => {
             const globalUsername = localStorage.getItem('global_active_username') || 'Nome Utente';
             const globalAvatar = localStorage.getItem('global_active_avatar') || 'Images/acrox_profile.png';
@@ -586,20 +585,253 @@
                 console.error(e);
             }
 
-            // CONTROLLO DEL PARAMETRO URL PER IL TAB
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
 
-            if (tabParam === 'musica') {
-                switchTab('musica', 'Files/Musica.txt');
+            if (tabParam === 'mechsounds') {
+                switchTab('mechsounds', 'Files/MechSounds/MechSounds.txt');
             } else {
-                switchTab('musica', 'Files/Musica.txt');
+                switchTab('musica', 'Files/Musica/Musica.txt');
             }
         });
 
         window.addEventListener('storage', (e) => {
             if(e.key === 'global_active_username' || e.key === 'global_active_avatar') location.reload();
         });
+
+    // --- SINTESI AUDIO MECCANICA AVANZATA ---
+    let audioCtx = null;
+    let selectedSwitchProfile = 'cherry-black';
+
+    function initAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    // Selettore dello switch
+    window.selectSwitch = function(profile, element) {
+        selectedSwitchProfile = profile;
+        
+        // Aggiorna classi grafiche dei profili
+        document.querySelectorAll('.switch-card').forEach(card => card.classList.remove('active'));
+        element.classList.add('active');
+        
+        // Riproduce subito un feedback del cambio switch
+        playMechSound();
+    };
+
+    // Sintetizza il suono meccanico in base allo switch selezionato
+    function playMechSound() {
+        initAudioContext();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        
+        // Configurazione acustica degli switch
+        let config = {
+            noiseGainVal: 0.1,
+            oscFreq: 120,
+            oscGainVal: 0.25,
+            decayTime: 0.08,
+            clickFreq: 1200,
+            clickGainVal: 0.0,
+            clickDecay: 0.01
+        };
+
+        if (selectedSwitchProfile === 'cherry-black') {
+            config.oscFreq = 85;
+            config.oscGainVal = 0.45;
+            config.noiseGainVal = 0.08;
+            config.decayTime = 0.12;
+            config.clickGainVal = 0.02;
+            config.clickFreq = 300;
+            config.clickDecay = 0.02;
+        } else if (selectedSwitchProfile === 'cherry-blue') {
+            config.oscFreq = 160;
+            config.oscGainVal = 0.15;
+            config.noiseGainVal = 0.18;
+            config.decayTime = 0.05;
+            config.clickGainVal = 0.45;
+            config.clickFreq = 3200;
+            config.clickDecay = 0.006;
+        } else if (selectedSwitchProfile === 'cherry-red') {
+            config.oscFreq = 110;
+            config.oscGainVal = 0.3;
+            config.noiseGainVal = 0.12;
+            config.decayTime = 0.07;
+            config.clickGainVal = 0.08;
+            config.clickFreq = 1000;
+            config.clickDecay = 0.01;
+        } else if (selectedSwitchProfile === 'gateron-brown') {
+            config.oscFreq = 135;
+            config.oscGainVal = 0.35;
+            config.noiseGainVal = 0.06;
+            config.decayTime = 0.09;
+            config.clickGainVal = 0.05;
+            config.clickFreq = 700;
+            config.clickDecay = 0.015;
+        }
+
+        // --- Generatore di Rumore (Impatto della tastiera) ---
+        const bufferSize = audioCtx.sampleRate * 0.2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noiseNode = audioCtx.createBufferSource();
+        noiseNode.buffer = buffer;
+
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.value = config.oscFreq * 3;
+        noiseFilter.Q.value = 1.0;
+
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(config.noiseGainVal, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + config.decayTime);
+
+        noiseNode.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+
+        // --- Generatore Tonale ---
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(config.oscFreq, now);
+        
+        oscGain.gain.setValueAtTime(config.oscGainVal, now);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, now + config.decayTime);
+
+        osc.connect(oscGain);
+        oscGain.connect(audioCtx.destination);
+
+        // --- Generatore Click ---
+        if (config.clickGainVal > 0) {
+            const clickOsc = audioCtx.createOscillator();
+            const clickGain = audioCtx.createGain();
+            
+            clickOsc.type = 'sine';
+            clickOsc.frequency.setValueAtTime(config.clickFreq, now);
+            
+            clickGain.gain.setValueAtTime(config.clickGainVal, now);
+            clickGain.gain.exponentialRampToValueAtTime(0.001, now + config.clickDecay);
+            
+            clickOsc.connect(clickGain);
+            clickGain.connect(audioCtx.destination);
+            
+            clickOsc.start(now);
+            clickOsc.stop(now + config.clickDecay + 0.05);
+        }
+
+        noiseNode.start(now);
+        noiseNode.stop(now + config.decayTime + 0.05);
+        osc.start(now);
+        osc.stop(now + config.decayTime + 0.05);
+    }
+
+    // --- INTERATTIVITÀ DELLA TASTIERA ---
+    const activeKeys = new Set();
+
+    window.addEventListener('keydown', (e) => {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            return;
+        }
+
+        let code = e.code;
+        
+        if (activeKeys.has(code)) {
+            e.preventDefault();
+            return;
+        }
+        activeKeys.add(code);
+
+        const keyEl = document.querySelector(`.key[data-key="${code}"]`);
+        if (keyEl) {
+            e.preventDefault();
+            keyEl.classList.add('active');
+            playMechSound();
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        let code = e.code;
+        activeKeys.delete(code);
+        const keyEl = document.querySelector(`.key[data-key="${code}"]`);
+        if (keyEl) {
+            keyEl.classList.remove('active');
+        }
+    });
+
+    // --- INTERATTIVITÀ DEL MOUSE (Corretta e inizializzata solo dopo il caricamento di MechSounds.txt) ---
+    // Disattiva il menu contestuale del tasto destro a livello globale
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+
+    function initMouseInteractivity() {
+        const mouseLeft = document.getElementById('mouse-left');
+        const mouseRight = document.getElementById('mouse-right');
+        const mouseWheel = document.getElementById('mouse-wheel');
+
+        // Se gli elementi grafici del mouse non sono ancora nel DOM, interrompe l'esecuzione per evitare errori
+        if (!mouseLeft || !mouseRight || !mouseWheel) return;
+
+        // Associa l'evento mousedown per accendere i tasti fisici
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 0) { // Click sinistro del mouse fisico
+                mouseLeft.classList.add('active');
+                ipcRenderer.send('trigger-mouse-sound', 'left');
+            } else if (e.button === 2) { // Click destro del mouse fisico
+                mouseRight.classList.add('active');
+                ipcRenderer.send('trigger-mouse-sound', 'right');
+            } else if (e.button === 1) { // Pressione della rotella del mouse fisico
+                mouseWheel.classList.add('scrolling');
+                ipcRenderer.send('trigger-mouse-sound', 'wheel');
+            }
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (e.button === 0) { // Rilascio sinistro
+                mouseLeft.classList.remove('active');
+            } else if (e.button === 2) { // Rilascio destro
+                mouseRight.classList.remove('active');
+            } else if (e.button === 1) { // Rilascio rotella
+                mouseWheel.classList.remove('scrolling');
+            }
+        });
+
+        // RILEVAMENTO DELLO SCROLL (Rotella fisica) - Nota: la rotella si accende a schermo ma NON farà rumore (grazie al filtro nel main.js)
+        document.addEventListener('wheel', () => {
+            mouseWheel.classList.add('scrolling');
+            ipcRenderer.send('trigger-mouse-sound', 'wheel');
+            
+            clearTimeout(window.wheelTimeout);
+            window.wheelTimeout = setTimeout(() => {
+                mouseWheel.classList.remove('scrolling');
+            }, 120);
+        }, { passive: true });
+
+        // Associa l'evento mousedown anche ai tasti grafici della tastiera virtuale (se presenti)
+        document.querySelectorAll('.key').forEach(keyEl => {
+            keyEl.addEventListener('mousedown', () => {
+                keyEl.classList.add('active');
+                playMechSound();
+            });
+            keyEl.addEventListener('mouseup', () => {
+                keyEl.classList.remove('active');
+            });
+            keyEl.addEventListener('mouseleave', () => {
+                keyEl.classList.remove('active');
+            });
+        });
+    }
     </script>
 </body>
 </html>

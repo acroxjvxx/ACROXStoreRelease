@@ -22,7 +22,17 @@
         .avatar-preview { width: 140px; height: 140px; background: #f7fafc; border: 4px dashed #cbd5e0; border-radius: 40px; margin: 0 auto 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #a0aec0; font-weight: 600; overflow: hidden; }
         #preview-img { width: 100%; height: 100%; object-fit: cover; display: none; }
         
-        .form-group input { width: 100%; padding: 1.1rem 1.4rem; border: 3px solid #e2e8f0; border-radius: 22px; background-color: rgba(247, 250, 252, 0.9); color: #2d3748; font-size: 1rem; outline: none; margin-bottom: 1.5rem; }
+        /* Contenitore per allineare l'input e l'icona info */
+        .input-container { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; }
+
+        .form-group input { flex: 1; padding: 1.1rem 1.4rem; border: 3px solid #e2e8f0; border-radius: 22px; background-color: rgba(247, 250, 252, 0.9); color: #2d3748; font-size: 1rem; outline: none; transition: border-color 0.3s ease; }
+        .form-group input.error-border { border-color: #fc8181 !important; }
+
+        /* Icona info "!" */
+        .info-icon { display: inline-flex; align-items: center; justify-content: center; background: #805ad5; color: white; width: 30px; height: 30px; border-radius: 50%; font-weight: 700; font-size: 1.1rem; cursor: help; transition: 0.2s; flex-shrink: 0; box-shadow: 0 4px 10px rgba(128, 90, 213, 0.2); }
+        .info-icon:hover { background: #6b46c1; transform: scale(1.1); }
+
+        .error-message { color: #e53e3e; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.2rem; display: none; }
 
         .btn { width: 100%; padding: 1.2rem; background: #e2e8f0; border: none; border-radius: 25px; color: #a0aec0; font-size: 1.15rem; font-weight: 600; cursor: not-allowed; transition: 0.3s; }
         .btn.active { background: linear-gradient(45deg, #805ad5, #9f7aea); color: white; cursor: pointer; box-shadow: 0 8px 20px rgba(128, 90, 213, 0.3); }
@@ -49,58 +59,60 @@
             <h2>Nome Utente</h2>
             <p class="subtitle">Scegli come farti chiamare</p>
             <div class="form-group">
-                <input type="text" id="username-input" placeholder="Inserisci il tuo nome..." maxlength="15" oninput="validateName()">
+                <div class="input-container">
+                    <input type="text" id="username-input" placeholder="Inserisci il tuo nome..." maxlength="10" oninput="validateName()">
+                    <span class="info-icon" title="Massimo 10 caratteri">!</span>
+                </div>
+                <div id="error-msg" class="error-message">Questo nome è già registrato! 🛑</div>
             </div>
             <button id="btn-name" class="btn" disabled onclick="finishSetup()">Conferma e Vai</button>
-            <br><button class="btn-skip" onclick="finishSetup()">Salta</button>
         </div>
     </div>
 
     <script>
+        const { ipcRenderer } = require('electron');
+
         const fileInput = document.getElementById('file-input');
         const previewImg = document.getElementById('preview-img');
         const placeholderText = document.getElementById('placeholder-text');
         const btnPhoto = document.getElementById('btn-photo');
         const btnName = document.getElementById('btn-name');
         const usernameInput = document.getElementById('username-input');
+        const errorMsg = document.getElementById('error-msg');
         
         let tempImage = null;
 
         // GESTIONE FOTO
         fileInput.onchange = (e) => {
-    const file = e.target.files[0];
+            const file = e.target.files[0];
+            if (!file) return;
 
-    if (!file) return;
+            const allowedTypes = ['image/png', 'image/jpeg'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Puoi caricare solo file PNG, JPG o JPEG.');
+                fileInput.value = '';
+                return;
+            }
 
-    const allowedTypes = [
-        'image/png',
-        'image/jpeg'
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-        alert('Puoi caricare solo file PNG, JPG o JPEG.');
-        fileInput.value = '';
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = (ev) => {
-        previewImg.src = ev.target.result;
-        previewImg.style.display = 'block';
-        placeholderText.style.display = 'none';
-
-        tempImage = ev.target.result;
-
-        btnPhoto.disabled = false;
-        btnPhoto.classList.add('active');
-    };
-
-    reader.readAsDataURL(file);
-};
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                previewImg.src = ev.target.result;
+                previewImg.style.display = 'block';
+                placeholderText.style.display = 'none';
+                tempImage = ev.target.result;
+                btnPhoto.disabled = false;
+                btnPhoto.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        };
 
         // GESTIONE NOME
         function validateName() {
+            usernameInput.value = usernameInput.value.replace(/[^a-zA-Z0-9a-zàèìòùÀÈÌÒÙ\s\-_]/g, '');
+
+            usernameInput.classList.remove('error-border');
+            errorMsg.style.display = 'none';
+
             if (usernameInput.value.trim().length > 0) {
                 btnName.disabled = false;
                 btnName.classList.add('active');
@@ -115,38 +127,71 @@
             document.getElementById('name-section').classList.remove('hidden');
         }
 
-        // SALVATAGGIO FINALE E SINCRONIZZAZIONE ARCHITETTURA PROFILI
-        function finishSetup() {
+        // SALVATAGGIO FINALE
+        async function finishSetup() {
             const finalImage = tempImage || 'Images/acrox_profile.png';
-            const finalUsername = usernameInput.value.trim() !== "" ? usernameInput.value : "Utente Acrox";
+            let finalUsername = usernameInput.value.trim();
 
-            // 1. Inizializza i nodi storici/legacy per retrocompatibilità
+            btnName.disabled = true;
+            btnName.innerText = "Verifica in corso...";
+
+            try {
+                const checkResult = await ipcRenderer.invoke('check-username-online', finalUsername);
+
+                if (!checkResult.success) {
+                    alert("Errore di rete: impossibile verificare la disponibilità del nome. Riprova.");
+                    resetButton();
+                    return;
+                }
+
+                if (checkResult.exists) {
+                    usernameInput.classList.add('error-border');
+                    errorMsg.style.display = 'block';
+                    resetButton();
+                    return;
+                }
+
+                const registerResult = await ipcRenderer.invoke('register-username-online', finalUsername);
+                if (!registerResult.success) {
+                    alert("Errore durante il salvataggio del nome online. Riprova.");
+                    resetButton();
+                    return;
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert("Si è verificato un errore inaspettato.");
+                resetButton();
+                return;
+            }
+
+            function resetButton() {
+                btnName.disabled = false;
+                btnName.innerText = "Conferma e Vai";
+            }
+
+            // Salvataggio nel database locale (localStorage)
             localStorage.setItem('profileImage', finalImage);
             localStorage.setItem('username', finalUsername);
 
-            // 2. Popola il Profilo Standard (Senza AISOS - Blocco 1)
             localStorage.setItem('username_1', finalUsername);
             localStorage.setItem('profileImage_1', finalImage);
             localStorage.setItem('userId_1', finalUsername.toLowerCase().replace(/\s+/g, ''));
             localStorage.setItem('bannerColor_1', '#4f545c');
             localStorage.setItem('userBio_1', 'La mia bio personalizzata.');
 
-            // 3. Imposta lo stato iniziale dell'abbonamento su disattivo (se non impostato)
             if (!localStorage.getItem('acrox_subscription')) {
                 localStorage.setItem('acrox_subscription', 'disattivo');
             }
 
-            // 4. Seleziona il profilo 1 (Senza AISOS) come attivo al primo avvio
             localStorage.setItem('active_profile_type', '1');
 
-            // 5. Allinea i nodi globali attivi letti dall'applicazione
             localStorage.setItem('global_active_username', finalUsername);
             localStorage.setItem('global_active_avatar', finalImage);
             localStorage.setItem('global_active_userId', finalUsername.toLowerCase().replace(/\s+/g, ''));
             localStorage.setItem('global_active_bio', 'La mia bio personalizzata.');
             localStorage.setItem('global_active_banner', '#4f545c');
 
-            // Reindirizzamento alla Home
             window.location.href = 'index.html';
         }
     </script>

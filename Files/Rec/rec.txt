@@ -1,0 +1,358 @@
+<style>
+    /* Reset & Variabili per Coerenza di Design */
+    :root {
+        --primary-glow: #6366f1;
+        --secondary-glow: #a78bfa;
+        --dark-bg: #0d0d11;
+        --card-bg: rgba(18, 18, 22, 0.45);
+        --border-color: rgba(255, 255, 255, 0.04);
+    }
+
+    .rec-coming-soon-container {
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 75vh;
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        animation: recFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Sfondo con particelle animate e mesh di luci gradienti */
+    .rec-bg-glows {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .glow-circle {
+        position: absolute;
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.15;
+        animation: floatGlow 12s ease-in-out infinite alternate;
+    }
+
+    .glow-1 {
+        background: var(--primary-glow);
+        top: 10%;
+        left: 15%;
+    }
+
+    .glow-2 {
+        background: var(--secondary-glow);
+        bottom: 15%;
+        right: 15%;
+        animation-delay: -4s;
+    }
+
+    /* Card Principale dell'Annuncio */
+    .rec-card {
+        position: relative;
+        z-index: 2;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        padding: 50px 40px;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 680px;
+        text-align: center;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+    }
+
+    /* Icona Fotocamera / Clip Animata in CSS */
+    .rec-icon-wrapper {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(99, 102, 241, 0.08);
+        border-radius: 50%;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        margin-bottom: 8px;
+    }
+
+    .rec-pulse-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid var(--primary-glow);
+        animation: ripplePulse 3s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+        opacity: 0;
+    }
+
+    .rec-pulse-ring-2 {
+        animation-delay: 1s;
+    }
+
+    .rec-main-emoji {
+        font-size: 45px;
+        z-index: 3;
+        animation: floatEmoji 3s ease-in-out infinite;
+    }
+
+    .rec-badge {
+        background: rgba(99, 102, 241, 0.15);
+        color: #818cf8;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        padding: 6px 14px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        animation: pulseBadge 2s ease-in-out infinite;
+    }
+
+    /* Testi */
+    .rec-title {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, #ffffff 30%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    .rec-description {
+        font-size: 15px;
+        line-height: 1.6;
+        color: rgba(228, 228, 231, 0.7);
+        max-width: 500px;
+        margin: 0;
+    }
+
+    /* Griglia delle Feature Future */
+    .future-features-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+        .future-features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .feature-item {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .feature-item:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(99, 102, 241, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .feature-icon-box {
+        font-size: 24px;
+        background: rgba(255, 255, 255, 0.03);
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .feature-texts {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .feature-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .feature-desc {
+        font-size: 11px;
+        color: rgba(228, 228, 231, 0.45);
+    }
+
+    /* Barra di caricamento "Work in Progress" dinamica */
+    .wip-bar-wrapper {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        height: 10px;
+        border-radius: 100px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .wip-bar-fill {
+        height: 100%;
+        width: 65%; /* Percentuale indicativa dello sviluppo */
+        background: linear-gradient(90deg, #4f46e5 0%, #a78bfa 100%);
+        border-radius: 100px;
+        position: relative;
+        animation: fillWip 2.5s ease-out forwards;
+    }
+
+    .wip-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(
+            90deg,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.2) 50%,
+            rgba(255,255,255,0) 100__
+        );
+        animation: progressShine 1.5s infinite linear;
+        background-size: 200% 100%;
+    }
+
+    .wip-status-text {
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(228, 228, 231, 0.4);
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: -12px;
+    }
+
+    /* ANIMAZIONI */
+    @keyframes recFadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floatGlow {
+        0% { transform: translateY(0) scale(1); }
+        100% { transform: translateY(-30px) scale(1.15); }
+    }
+
+    @keyframes floatEmoji {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-8px) rotate(4deg); }
+    }
+
+    @keyframes ripplePulse {
+        0% { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    @keyframes pulseBadge {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    @keyframes fillWip {
+        from { width: 0%; }
+        to { width: 65%; }
+    }
+
+    @keyframes progressShine {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+</style>
+
+<div class="rec-coming-soon-container">
+    <!-- Luci di Sfondo Animate -->
+    <div class="rec-bg-glows">
+        <div class="glow-circle glow-1"></div>
+        <div class="glow-circle glow-2"></div>
+    </div>
+
+    <!-- Pannello Principale -->
+    <div class="rec-card">
+        <div class="rec-badge">Feature in arrivo</div>
+        
+        <!-- Icona animata con Onde Pulse -->
+        <div class="rec-icon-wrapper">
+            <div class="rec-pulse-ring"></div>
+            <div class="rec-pulse-ring rec-pulse-ring-2"></div>
+            <span class="rec-main-emoji">📹</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <h1 class="rec-title">Registra e Salva le tue Clip!</h1>
+            <p class="rec-description">
+                Stiamo lavorando a un sistema di registrazione super integrato. Presto potrai catturare i tuoi momenti di gioco epici (e spaventosi!) con un solo clic.
+            </p>
+        </div>
+
+        <!-- Barra di Progresso Sviluppo -->
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin: 5px 0;">
+            <div class="wip-bar-wrapper">
+                <div class="wip-bar-fill"></div>
+            </div>
+            <div class="wip-status-text">
+                <span>Codificazione dei codec audio/video...</span>
+                <span>65% Pronto</span>
+            </div>
+        </div>
+
+        <!-- Anteprima delle Feature future -->
+        <div class="future-features-grid">
+            <div class="feature-item">
+                <div class="feature-icon-box">⚡</div>
+                <div class="feature-texts">
+                    <span class="feature-title">Instant Replay</span>
+                    <span class="feature-desc">Salva gli ultimi 30 secondi in tempo reale.</span>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon-box">🎙️</div>
+                <div class="feature-texts">
+                    <span class="feature-title">Cattura Audio Pulita</span>
+                    <span class="feature-desc">Microfono e gioco separati per l'editing.</span>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon-box">✂️</div>
+                <div class="feature-texts">
+                    <span class="feature-title">Editor Integrato</span>
+                    <span class="feature-desc">Taglia e accorcia le clip direttamente qui.</span>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon-box">🚀</div>
+                <div class="feature-texts">
+                    <span class="feature-title">Esportazione Ultra-Fast</span>
+                    <span class="feature-desc">Rendering ottimizzato senza cali di FPS.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

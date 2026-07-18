@@ -8,6 +8,7 @@ let currentTrackIndex = -1;
 const audioPlayer = new Audio();
 const MAX_TRACKS = 10;
 let isSeeking = false;
+let isRepeatActive = false; // 🔁 Stato della ripetizione del brano singolo (false = Grigio, true = Azzurro)
 
 // 1. Inizializza IndexedDB
 function initDB() {
@@ -36,7 +37,7 @@ function loadPlaylist() {
         if (!db) return reject("Database non inizializzato");
         
         const transaction = db.transaction(["tracks"], "readonly");
-        const store = transaction.objectStore(["tracks"]);
+        const store = transaction.objectStore("tracks");
         const request = store.getAll();
 
         request.onsuccess = (e) => {
@@ -65,8 +66,14 @@ function loadPlaylist() {
 function loadTrack(index, forcePlay = false) {
     if (playlist.length === 0 || index < 0 || index >= playlist.length) return;
     
+    // 🔁 RESETTA IL REPEAT AD ODNI CAMBIO BRANO (RITORNA IN GRIGIO)
+    isRepeatActive = false;
+    
     currentTrackIndex = index;
     audioPlayer.src = playlist[currentTrackIndex].audioSrc;
+    
+    // 💾 SALVA IL TITOLO DEL BRANO ATTUALE PER IL PROSSIMO RIAVVIO
+    localStorage.setItem('saved_music_track_title', playlist[currentTrackIndex].title);
     
     if (forcePlay) {
         audioPlayer.play().catch(e => console.log("Riproduzione bloccata o interrotta:", e));
@@ -83,13 +90,18 @@ function playNext() {
     loadTrack(nextIndex, true);
 }
 
-// Eventi nativi del player HTML5
+// Eventi nativi del player HTML5 aggiornati per gestire il Repeat
 audioPlayer.onended = () => { 
-    playNext(); 
+    if (isRepeatActive) {
+        audioPlayer.currentTime = 0; // Riparte dall'inizio
+        audioPlayer.play().catch(e => console.log(e));
+    } else {
+        playNext(); 
+    }
 };
 
 audioPlayer.ontimeupdate = () => {
-    // Invia l'avanzamento dei secondi alla UI visibile (es. Settings.html)
+    // Invia l'avanzamento dei secondi alla UI visibile (es. Settings.html o la nuova pagina Musica.html)
     ipcRenderer.send('audio-status-update', {
         type: 'timeupdate',
         currentTime: audioPlayer.currentTime,
@@ -97,7 +109,7 @@ audioPlayer.ontimeupdate = () => {
     });
 };
 
-// Sincronizza i testi e le copertine inviando i dati al Main Process
+// Sincronizza i testi, le copertine e lo stato del repeat inviando i dati al Main Process
 function sendTrackStatusToUI() {
     if (currentTrackIndex === -1 || playlist.length === 0) return;
     
@@ -105,12 +117,13 @@ function sendTrackStatusToUI() {
         type: 'trackchange',
         title: playlist[currentTrackIndex].title,
         coverSrc: playlist[currentTrackIndex].coverSrc,
-        paused: audioPlayer.paused
+        paused: audioPlayer.paused,
+        repeatActive: isRepeatActive // 🔁 INVIA LO STATO DEL REPEAT AGGIORNATO ALLA UI
     });
 }
 
-// 5. ASCOLTO DEI COMANDI IPC (Inviati dall'interfaccia grafica tramite il Main Process)
-ipcRenderer.on('execute-music-command', (event, command) => {
+// 5. FUNZIONE DI GESTIONE DEI COMANDI IPC
+const handleMusicCommand = (event, command) => {
     switch(command.action) {
         case 'play-pause':
             if (playlist.length === 0) return;
@@ -139,6 +152,8 @@ ipcRenderer.on('execute-music-command', (event, command) => {
 
         case 'volume':
             audioPlayer.volume = command.value;
+            // Salva il volume modificato
+            localStorage.setItem('saved_music_volume', command.value);
             break;
 
         case 'seek':
@@ -149,6 +164,11 @@ ipcRenderer.on('execute-music-command', (event, command) => {
             if (command.index >= 0 && command.index < playlist.length) {
                 loadTrack(command.index, true);
             }
+            break;
+
+        case 'toggle-repeat': // 🔁 Gestione dell'azione inviata dall'interfaccia HTML
+            isRepeatActive = !isRepeatActive;
+            sendTrackStatusToUI(); // Aggiorna immediatamente la UI per accendere/spegnere l'azzurro
             break;
 
         case 'request-sync': // Quando l'utente ricarica la pagina, invia subito i dati attivi
@@ -173,7 +193,8 @@ ipcRenderer.on('execute-music-command', (event, command) => {
                         type: 'trackchange',
                         title: 'Nessun brano',
                         coverSrc: 'https://placehold.co/150x150/ffffff/000000?text=Audio',
-                        paused: true
+                        paused: true,
+                        repeatActive: false
                     });
                 } 
                 // 3. Se c'era una canzone in riproduzione, controlliamo se esiste ancora
@@ -199,7 +220,11 @@ ipcRenderer.on('execute-music-command', (event, command) => {
             });
             break;
     }
-});
+};
+
+// Ascolta su entrambi i canali per evitare problemi di sincronizzazione tra Main e Renderer
+ipcRenderer.on('execute-music-command', handleMusicCommand);
+ipcRenderer.on('music-command', handleMusicCommand);
 
 // 6. Avvio e caricamento iniziale asincrono all'apertura dell'applicazione
 window.addEventListener('DOMContentLoaded', async () => {
@@ -216,9 +241,21 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
         
         if (playlist.length > 0) {
-            // Predispone la prima canzone (carica il buffer) ma non forzare il .play() 
+            // 🟢 RECUPERA L'ULTIMO BRANO ASCOLTATO
+            const savedTrackTitle = localStorage.getItem('saved_music_track_title');
+            let trackIndexToLoad = 0; // Di base parte dalla prima se non trova riscontri
+
+            if (savedTrackTitle) {
+                // Cerca la traccia nella playlist attuale che ha lo stesso titolo salvato
+                const foundIndex = playlist.findIndex(t => t.title === savedTrackTitle);
+                if (foundIndex !== -1) {
+                    trackIndexToLoad = foundIndex;
+                }
+            }
+
+            // Predispone la canzone salvata (carica il buffer) ma non forzare il .play() 
             // per evitare che Chromium generi un errore di violazione dell'Autoplay prima del login.
-            loadTrack(0, false); 
+            loadTrack(trackIndexToLoad, false); 
         }
     } catch (error) {
         console.error("Errore nell'avvio del player audio di background:", error);

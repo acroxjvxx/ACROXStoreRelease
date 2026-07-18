@@ -1,0 +1,888 @@
+<h1>MechSounds</h1>
+
+<div class="card mechsounds-container">
+    <p class="subtitle">Seleziona uno switch, premi i tasti sullo schermo o usa la tua tastiera fisica/mouse per ascoltare il feedback sonoro meccanico!</p>
+
+    <!-- Professional Toggles Grid -->
+    <div class="controls-grid">
+        <div class="mechvibes-control">
+            <span class="control-label">Modalità MechVibes (Suoni di sottofondo globali)</span>
+            <label class="switch-toggle">
+                <input type="checkbox" id="mechvibes-status" checked onchange="toggleMechVibes(this.checked)">
+                <span class="slider-round"></span>
+            </label>
+        </div>
+        
+        <!-- KeySounds con Controllo Volume -->
+        <div class="mechvibes-control-volume-wrapper">
+            <div class="mechvibes-control">
+                <span class="control-label">Suoni Tastiera (KeySounds)</span>
+                <label class="switch-toggle">
+                    <input type="checkbox" id="keysounds-status" checked onchange="toggleKeySounds(this.checked)">
+                    <span class="slider-round"></span>
+                </label>
+            </div>
+            <div class="volume-slider-container">
+                <span class="volume-emoji">🔊</span>
+                <input type="range" id="keysounds-volume" min="0" max="1" step="0.05" value="1" oninput="updateKeyVolume(this.value)">
+            </div>
+        </div>
+
+        <!-- MouseSounds con Controllo Volume -->
+        <div class="mechvibes-control-volume-wrapper">
+            <div class="mechvibes-control">
+                <span class="control-label">Suoni Mouse (MouseSounds)</span>
+                <label class="switch-toggle">
+                    <input type="checkbox" id="mousesounds-status" checked onchange="toggleMouseSounds(this.checked)">
+                    <span class="slider-round"></span>
+                </label>
+            </div>
+            <div class="volume-slider-container">
+                <span class="volume-emoji">🔊</span>
+                <input type="range" id="mousesounds-volume" min="0" max="1" step="0.05" value="1" oninput="updateMouseVolume(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Switch Selector Grid -->
+    <div class="switch-selector-container">
+        <h3>Profili Switch Disponibili</h3>
+        <div class="switch-grid">
+            <div class="switch-card active" onclick="selectSwitch('cherry-black', this)">
+                <div class="switch-color" style="background: #1a1a1a; border: 2px solid #333;"></div>
+                <div class="switch-info">
+                    <span class="switch-name">CherryMX Black</span>
+                    <span class="switch-desc">Lineare pesante, suono profondo (Thock)</span>
+                </div>
+            </div>
+            <div class="switch-card" onclick="selectSwitch('cherry-blue', this)">
+                <div class="switch-color" style="background: #0080ff; border: 2px solid #0050b3;"></div>
+                <div class="switch-info">
+                    <span class="switch-name">CherryMX Blue</span>
+                    <span class="switch-desc">Clicky, suono acuto e metallico (Click)</span>
+                </div>
+            </div>
+            <div class="switch-card" onclick="selectSwitch('cherry-red', this)">
+                <div class="switch-color" style="background: #ff3333; border: 2px solid #b30000;"></div>
+                <div class="switch-info">
+                    <span class="switch-name">CherryMX Red</span>
+                    <span class="switch-desc">Lineare leggero, suono morbido (Clack)</span>
+                </div>
+            </div>
+            <div class="switch-card" onclick="selectSwitch('gateron-brown', this)">
+                <div class="switch-color" style="background: #8b5a2b; border: 2px solid #5c3a1a;"></div>
+                <div class="switch-info">
+                    <span class="switch-name">Gateron Brown</span>
+                    <span class="switch-desc">Tattile bilanciato, suono attutito (Pop)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Virtual Keyboard & Mouse Wrapper -->
+    <div class="keyboard-wrapper">
+        <div class="keyboard">
+            <!-- Row 1 -->
+            <div class="keyboard-row">
+                <div class="key" data-key="Escape">Esc</div>
+                <div class="key" data-key="Digit1">1</div>
+                <div class="key" data-key="Digit2">2</div>
+                <div class="key" data-key="Digit3">3</div>
+                <div class="key" data-key="Digit4">4</div>
+                <div class="key" data-key="Digit5">5</div>
+                <div class="key" data-key="Digit6">6</div>
+                <div class="key" data-key="Digit7">7</div>
+                <div class="key" data-key="Digit8">8</div>
+                <div class="key" data-key="Digit9">9</div>
+                <div class="key" data-key="Digit0">0</div>
+                <div class="key" data-key="Minus">-</div>
+                <div class="key" data-key="Equal">=</div>
+                <div class="key wide-backspace" data-key="Backspace">Backspace</div>
+            </div>
+            <!-- Row 2 -->
+            <div class="keyboard-row">
+                <div class="key wide-tab" data-key="Tab">Tab</div>
+                <div class="key" data-key="KeyQ">Q</div>
+                <div class="key" data-key="KeyW">W</div>
+                <div class="key" data-key="KeyE">E</div>
+                <div class="key" data-key="KeyR">R</div>
+                <div class="key" data-key="KeyT">T</div>
+                <div class="key" data-key="KeyY">Y</div>
+                <div class="key" data-key="KeyU">U</div>
+                <div class="key" data-key="KeyI">I</div>
+                <div class="key" data-key="KeyO">O</div>
+                <div class="key" data-key="KeyP">P</div>
+                <div class="key" data-key="BracketLeft">[</div>
+                <div class="key" data-key="BracketRight">]</div>
+                <div class="key" data-key="BracketRight">\</div>
+            </div>
+            <!-- Row 3 -->
+            <div class="keyboard-row">
+                <div class="key wide-caps" data-key="CapsLock">Caps</div>
+                <div class="key" data-key="KeyA">A</div>
+                <div class="key" data-key="KeyS">S</div>
+                <div class="key" data-key="KeyD">D</div>
+                <div class="key" data-key="KeyF">F</div>
+                <div class="key" data-key="KeyG">G</div>
+                <div class="key" data-key="KeyH">H</div>
+                <div class="key" data-key="KeyJ">J</div>
+                <div class="key" data-key="KeyK">K</div>
+                <div class="key" data-key="KeyL">L</div>
+                <div class="key" data-key="Semicolon">;</div>
+                <div class="key" data-key="Quote">'</div>
+                <div class="key wide-enter" data-key="Enter">Enter</div>
+            </div>
+            <!-- Row 4 -->
+            <div class="keyboard-row">
+                <div class="key wide-shift-left" data-key="ShiftLeft">Shift</div>
+                <div class="key" data-key="KeyZ">Z</div>
+                <div class="key" data-key="KeyX">X</div>
+                <div class="key" data-key="KeyC">C</div>
+                <div class="key" data-key="KeyV">V</div>
+                <div class="key" data-key="KeyB">B</div>
+                <div class="key" data-key="KeyN">N</div>
+                <div class="key" data-key="KeyM">M</div>
+                <div class="key" data-key="Comma">,</div>
+                <div class="key" data-key="Period">.</div>
+                <div class="key" data-key="Slash">/</div>
+                <div class="key wide-shift-right" data-key="ShiftRight">Shift</div>
+            </div>
+            <!-- Row 5 -->
+            <div class="keyboard-row">
+                <div class="key wide-ctrl" data-key="ControlLeft">Ctrl</div>
+                <div class="key" data-key="MetaLeft">Win</div>
+                <div class="key" data-key="AltLeft">Alt</div>
+                <div class="key spacebar" data-key="Space">Spacebar</div>
+                <div class="key" data-key="AltRight">Alt</div>
+                <div class="key" data-key="MetaRight">Win</div>
+                <div class="key" data-key="wide-ctrl" data-key="ControlRight">Ctrl</div>
+            </div>
+        </div>
+
+        <!-- Virtual Mouse Integrated -->
+        <div class="mouse-container">
+            <div class="mouse">
+                <div class="mouse-btn mouse-left" id="mouse-left">L</div>
+                <div class="mouse-wheel" id="mouse-wheel"></div>
+                <div class="mouse-btn mouse-right" id="mouse-right">R</div>
+                <div class="mouse-body"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling del modulo MechSounds */
+    .mechsounds-container {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 30px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+        text-align: center;
+        font-weight: 700;
+        font-size: 32px;
+        background: linear-gradient(135deg, #ffffff 0%, #a5a5a5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 5px !important;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 10px;
+    }
+
+    /* Layout a griglia per i blocchi di controllo */
+    .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+    }
+
+    /* Wrapper per allineare verticalmente toggle + slider volume dello stesso tipo */
+    .mechvibes-control-volume-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px 20px;
+        border-radius: 12px;
+    }
+
+    /* Rimosso background e padding dal controllo singolo quando dentro il wrapper */
+    .mechvibes-control-volume-wrapper .mechvibes-control {
+        background: transparent;
+        border: none;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .mechvibes-control {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px 20px;
+        border-radius: 12px;
+    }
+
+    .control-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .switch-toggle {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    .switch-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider-round {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 34px;
+    }
+
+    .slider-round:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #ffffff;
+        transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .switch-toggle input:checked + .slider-round {
+        background-color: #ed4245;
+        border-color: #ed4245;
+    }
+
+    .switch-toggle input:checked + .slider-round:before {
+        transform: translateX(22px);
+    }
+
+    /* NUOVO: Grafica per lo Slider del Volume */
+    .volume-slider-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 4px;
+        width: 100%;
+    }
+
+    .volume-emoji {
+        font-size: 14px;
+        user-select: none;
+    }
+
+    .volume-slider-container input[type="range"] {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 5px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        cursor: pointer;
+    }
+
+    .volume-slider-container input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ed4245;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+
+    .volume-slider-container input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+    }
+
+    /* Switch Selector */
+    .switch-selector-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .switch-selector-container h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        border-left: 4px solid #ed4245;
+        padding-left: 10px;
+        margin-bottom: 5px;
+    }
+
+    .switch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+    }
+
+    .switch-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .switch-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .switch-card.active {
+        background: rgba(237, 66, 69, 0.15);
+        border-color: rgba(237, 66, 69, 0.4);
+        box-shadow: 0 4px 20px rgba(237, 66, 69, 0.15);
+    }
+
+    .switch-color {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .switch-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .switch-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: white;
+    }
+
+    .switch-desc {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Keyboard and Mouse Wrapper Layout */
+    .keyboard-wrapper {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .keyboard {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+        min-width: 600px;
+        user-select: none;
+    }
+
+    .keyboard-row {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .key {
+        flex: 1;
+        height: 48px;
+        background: linear-gradient(180deg, #2d3035 0%, #202225 100%);
+        border: 1px solid #18191c;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 3px 0px #111214, 0 4px 10px rgba(0,0,0,0.4);
+        transition: transform 0.05s, box-shadow 0.05s, background 0.05s;
+    }
+
+    .key:hover {
+        background: linear-gradient(180deg, #35393f 0%, #26292d 100%);
+        color: white;
+    }
+
+    .key.active, .key:active {
+        transform: translateY(3px);
+        box-shadow: 0 0px 0px transparent, 0 1px 4px rgba(0,0,0,0.2);
+        background: linear-gradient(180deg, #ed4245 0%, #c93538 100%) !important;
+        border-color: #9b2426;
+        color: white !important;
+    }
+
+    /* Special Key Widths */
+    .wide-backspace { flex: 2; }
+    .wide-tab { flex: 1.5; }
+    .wide-backslash { flex: 1.5; }
+    .wide-caps { flex: 1.8; }
+    .wide-enter { flex: 2.2; }
+    .wide-shift-left { flex: 2.4; }
+    .wide-shift-right { flex: 2.4; }
+    .spacebar { flex: 8; }
+    .wide-ctrl { flex: 1.5; }
+
+    /* MOUSE VIRTUALI STYLING */
+    .mouse-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 120px;
+        height: 270px;
+        flex-shrink: 0;
+    }
+
+    .mouse {
+        position: relative;
+        width: 110px;
+        height: 190px;
+        background: #202225;
+        border: 2px solid #2d3035;
+        border-radius: 55px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 2px 5px rgba(255,255,255,0.05);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 95px 1fr;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    .mouse-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        background: linear-gradient(180deg, #2a2d32 0%, #1d1e22 100%);
+        border-bottom: 2px solid #141517;
+        transition: background 0.05s, color 0.05s;
+    }
+
+    .mouse-left {
+        border-right: 1px solid #141517;
+        border-top-left-radius: 50px;
+    }
+
+    .mouse-right {
+        border-left: 1px solid #141517;
+        border-top-right-radius: 50px;
+    }
+
+    .mouse-btn:hover {
+        background: #2d3035;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .mouse-btn.active, .mouse-btn:active {
+        background: linear-gradient(180deg, #ed4245 0%, #c93538 100%) !important;
+        color: white !important;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .mouse-wheel {
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 10px;
+        height: 28px;
+        background: #ff5e62;
+        border-radius: 5px;
+        box-shadow: 0 0 8px rgba(255, 94, 98, 0.6);
+        z-index: 10;
+        cursor: pointer;
+        transition: background 0.1s;
+    }
+
+    .mouse-wheel:hover {
+        background: #ff8083;
+    }
+
+    .mouse-wheel.scrolling {
+        background: #ffffff;
+        box-shadow: 0 0 12px #ffffff;
+    }
+
+    .mouse-body {
+        grid-column: span 2;
+        background: radial-gradient(circle at bottom, #2d3035 0%, #161719 100%);
+        border-bottom-left-radius: 50px;
+        border-bottom-right-radius: 50px;
+    }
+</style>
+
+<script>
+    // --- SINTESI AUDIO MECCANICA AVANZATA ---
+    let audioCtx = null;
+    let selectedSwitchProfile = 'cherry-black';
+    let mechVibesEnabled = true;
+    let keySoundsEnabled = true;   
+    let mouseSoundsEnabled = true; 
+    
+    // NUOVO: Moltiplicatori del volume (da 0 a 1)
+    let keyVolume = 1.0;
+    let mouseVolume = 1.0;
+
+    function initAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    // Gestione cambi stato dei Toggle
+    window.toggleMechVibes = function(enabled) {
+        mechVibesEnabled = enabled;
+    };
+
+    window.toggleKeySounds = function(enabled) {
+        keySoundsEnabled = enabled;
+    };
+
+    window.toggleMouseSounds = function(enabled) {
+        mouseSoundsEnabled = enabled;
+    };
+
+    // NUOVO: Funzioni per aggiornare dinamicamente il volume
+    window.updateKeyVolume = function(val) {
+        keyVolume = parseFloat(val);
+    };
+
+    window.updateMouseVolume = function(val) {
+        mouseVolume = parseFloat(val);
+    };
+
+    // Selettore dello switch
+    window.selectSwitch = function(profile, element) {
+        selectedSwitchProfile = profile;
+        
+        document.querySelectorAll('.switch-card').forEach(card => card.classList.remove('active'));
+        element.classList.add('active');
+        
+        if (mechVibesEnabled && keySoundsEnabled) {
+            playMechSound();
+        }
+    };
+
+    // Sintetizza il suono meccanico applicando il volume della tastiera
+    function playMechSound() {
+        initAudioContext();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        
+        // Configurazione acustica degli switch
+        let config = {
+            noiseGainVal: 0.1,
+            oscFreq: 120,
+            oscGainVal: 0.25,
+            decayTime: 0.08,
+            clickFreq: 1200,
+            clickGainVal: 0.0,
+            clickDecay: 0.01
+        };
+
+        if (selectedSwitchProfile === 'cherry-black') {
+            config.oscFreq = 85;
+            config.oscGainVal = 0.45;
+            config.noiseGainVal = 0.08;
+            config.decayTime = 0.12;
+            config.clickGainVal = 0.02;
+            config.clickFreq = 300;
+            config.clickDecay = 0.02;
+        } else if (selectedSwitchProfile === 'cherry-blue') {
+            config.oscFreq = 160;
+            config.oscGainVal = 0.15;
+            config.noiseGainVal = 0.18;
+            config.decayTime = 0.05;
+            config.clickGainVal = 0.45;
+            config.clickFreq = 3200;
+            config.clickDecay = 0.006;
+        } else if (selectedSwitchProfile === 'cherry-red') {
+            config.oscFreq = 110;
+            config.oscGainVal = 0.3;
+            config.noiseGainVal = 0.12;
+            config.decayTime = 0.07;
+            config.clickGainVal = 0.08;
+            config.clickFreq = 1000;
+            config.clickDecay = 0.01;
+        } else if (selectedSwitchProfile === 'gateron-brown') {
+            config.oscFreq = 135;
+            config.oscGainVal = 0.35;
+            config.noiseGainVal = 0.06;
+            config.decayTime = 0.09;
+            config.clickGainVal = 0.05;
+            config.clickFreq = 700;
+            config.clickDecay = 0.015;
+        }
+
+        // --- Generatore di Rumore ---
+        const bufferSize = audioCtx.sampleRate * 0.2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noiseNode = audioCtx.createBufferSource();
+        noiseNode.buffer = buffer;
+
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.value = config.oscFreq * 3;
+        noiseFilter.Q.value = 1.0;
+
+        const noiseGain = audioCtx.createGain();
+        // NUOVO: Moltiplicato per keyVolume
+        noiseGain.gain.setValueAtTime(config.noiseGainVal * keyVolume, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + config.decayTime);
+
+        noiseNode.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+
+        // --- Generatore Tonale ---
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(config.oscFreq, now);
+        
+        // NUOVO: Moltiplicato per keyVolume
+        oscGain.gain.setValueAtTime(config.oscGainVal * keyVolume, now);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, now + config.decayTime);
+
+        osc.connect(oscGain);
+        oscGain.connect(audioCtx.destination);
+
+        // --- Generatore Click ---
+        if (config.clickGainVal > 0) {
+            const clickOsc = audioCtx.createOscillator();
+            const clickGain = audioCtx.createGain();
+            
+            clickOsc.type = 'sine';
+            clickOsc.frequency.setValueAtTime(config.clickFreq, now);
+            
+            // NUOVO: Moltiplicato per keyVolume
+            clickGain.gain.setValueAtTime(config.clickGainVal * keyVolume, now);
+            clickGain.gain.exponentialRampToValueAtTime(0.001, now + config.clickDecay);
+            
+            clickOsc.connect(clickGain);
+            clickGain.connect(audioCtx.destination);
+            
+            clickOsc.start(now);
+            clickOsc.stop(now + config.clickDecay + 0.05);
+        }
+
+        noiseNode.start(now);
+        noiseNode.stop(now + config.decayTime + 0.05);
+        osc.start(now);
+        osc.stop(now + config.decayTime + 0.05);
+    }
+
+    // --- SINTESI AUDIO MOUSE ---
+    function playMouseSound(type) {
+        initAudioContext();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+
+        let frequency = 2800;
+        let gainValue = 0.3;
+        let decay = 0.015;
+
+        if (type === 'right') {
+            frequency = 3200;
+            gainValue = 0.25;
+            decay = 0.012;
+        } else if (type === 'wheel') {
+            frequency = 1200;
+            gainValue = 0.15;
+            decay = 0.008;
+        }
+
+        const osc = audioCtx.createOscillator();
+        const oscGain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(frequency, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + decay);
+
+        // NUOVO: Moltiplicato per mouseVolume
+        oscGain.gain.setValueAtTime(gainValue * mouseVolume, now);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+        osc.connect(oscGain);
+        oscGain.connect(audioCtx.destination);
+
+        const bufferSize = audioCtx.sampleRate * 0.05;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noiseNode = audioCtx.createBufferSource();
+        noiseNode.buffer = buffer;
+
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        noiseFilter.frequency.value = type === 'wheel' ? 800 : 4000;
+
+        const noiseGain = audioCtx.createGain();
+        // NUOVO: Moltiplicato per mouseVolume
+        noiseGain.gain.setValueAtTime(gainValue * 0.4 * mouseVolume, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+        noiseNode.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + decay + 0.02);
+        noiseNode.start(now);
+        noiseNode.stop(now + decay + 0.02);
+    }
+
+    // --- INTERATTIVITÀ DELLA TASTIERA ---
+    const activeKeys = new Set();
+
+    document.querySelectorAll('.key').forEach(keyEl => {
+        keyEl.addEventListener('mousedown', () => {
+            keyEl.classList.add('active');
+            if (mechVibesEnabled && keySoundsEnabled) playMechSound();
+        });
+        keyEl.addEventListener('mouseup', () => {
+            keyEl.classList.remove('active');
+        });
+        keyEl.addEventListener('mouseleave', () => {
+            keyEl.classList.remove('active');
+        });
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            return;
+        }
+
+        let code = e.code;
+        
+        if (activeKeys.has(code)) {
+            e.preventDefault();
+            return;
+        }
+        activeKeys.add(code);
+
+        const keyEl = document.querySelector(`.key[data-key="${code}"]`);
+        if (keyEl) {
+            e.preventDefault();
+            keyEl.classList.add('active');
+            if (mechVibesEnabled && keySoundsEnabled) playMechSound();
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        let code = e.code;
+        activeKeys.delete(code);
+        const keyEl = document.querySelector(`.key[data-key="${code}"]`);
+        if (keyEl) {
+            keyEl.classList.remove('active');
+        }
+    });
+
+    // --- INTERATTIVITÀ DEL MOUSE ---
+    const mouseLeft = document.getElementById('mouse-left');
+    const mouseRight = document.getElementById('mouse-right');
+    const mouseWheel = document.getElementById('mouse-wheel');
+
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        if (e.button === 0) {
+            mouseLeft.classList.add('active');
+            if (mechVibesEnabled && mouseSoundsEnabled) playMouseSound('left');
+        } else if (e.button === 2) {
+            mouseRight.classList.add('active');
+            if (mechVibesEnabled && mouseSoundsEnabled) playMouseSound('right');
+        } else if (e.button === 1) {
+            mouseWheel.classList.add('scrolling');
+            if (mechVibesEnabled && mouseSoundsEnabled) playMouseSound('wheel');
+        }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+        if (e.button === 0) {
+            mouseLeft.classList.remove('active');
+        } else if (e.button === 2) {
+            mouseRight.classList.remove('active');
+        } else if (e.button === 1) {
+            mouseWheel.classList.remove('scrolling');
+        }
+    });
+
+    document.addEventListener('wheel', () => {
+        if (!mechVibesEnabled || !mouseSoundsEnabled) return;
+        
+        mouseWheel.classList.add('scrolling');
+        playMouseSound('wheel');
+        
+        clearTimeout(window.wheelTimeout);
+        window.wheelTimeout = setTimeout(() => {
+            mouseWheel.classList.remove('scrolling');
+        }, 120);
+    }, { passive: true });
+</script>

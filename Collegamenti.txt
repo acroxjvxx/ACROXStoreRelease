@@ -1,0 +1,182 @@
+<style>
+    .collegamenti-container { 
+        max-width: 800px; 
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    
+    .collegamenti-container h1 {
+        text-align: center;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 30px;
+        color: #ffffff;
+    }
+    
+    .platform-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px; 
+        padding: 20px 24px;
+        display: flex; 
+        justify-content: space-between;
+        align-items: center; 
+        margin-top: 16px;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                    background 0.25s ease, 
+                    box-shadow 0.25s ease;
+    }
+    
+    /* Effetto Hover sulle Card */
+    .platform-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .platform-info { display: flex; align-items: center; gap: 18px; }
+    
+    .platform-icon { 
+        background: rgba(0, 0, 0, 0.25); 
+        width: 54px; 
+        height: 54px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .platform-details h3 { 
+        font-size: 16px; 
+        font-weight: 600;
+        margin-bottom: 4px; 
+        color: #ffffff;
+    }
+    
+    .platform-status { 
+        font-size: 13px; 
+        opacity: 0.5; 
+        transition: opacity 0.2s ease;
+    }
+    
+    .platform-status.connected { 
+        color: #43b581; 
+        opacity: 1; 
+        font-weight: 600; 
+    }
+    
+    /* Stile Bottoni Uniforme ed Elegante */
+    .btn-collega, .btn-apri, .btn-modale {
+        padding: 10px 22px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer !important;
+        font-weight: 600;
+        font-size: 14px;
+        transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+    
+    .btn-collega { 
+        background: #5865f2; 
+        color: white; 
+        box-shadow: 0 4px 12px rgba(88, 101, 242, 0.2);
+    }
+    
+    .btn-collega:hover { 
+        background: #4752c4; 
+        box-shadow: 0 4px 16px rgba(88, 101, 242, 0.35);
+    }
+    
+    .btn-collega.connected { 
+        background: rgba(240, 71, 71, 0.1); 
+        border: 1px solid rgba(240, 71, 71, 0.25); 
+        color: #ff7878; 
+        box-shadow: none;
+    }
+    
+    .btn-collega.connected:hover { 
+        background: rgba(240, 71, 71, 0.2); 
+        border-color: rgba(240, 71, 71, 0.4);
+    }
+    
+    .btn-apri { 
+        background: rgba(255, 255, 255, 0.08); 
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: white; 
+        margin-right: 10px; 
+    }
+    
+    .btn-apri:hover { 
+        background: rgba(255, 255, 255, 0.15); 
+    }
+    
+    /* Click Animazione sui Pulsanti */
+    .btn-collega:active, .btn-apri:active, .btn-modale:active {
+        transform: scale(0.97);
+    }
+
+    /* Input focus design */
+    .prompt-box input:focus {
+        border-color: #5865f2 !important;
+        box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15);
+    }
+</style>
+
+<div class="collegamenti-container">
+    <h1>Collegamenti</h1>
+    
+    <div class="platform-card">
+        <div class="platform-info">
+            <div class="platform-icon">
+                <img src="Images/tiktok_logo.png" alt="TikTok" style="width: 42px; height: 42px; border-radius: 8px;">
+            </div>
+            <div class="platform-details">
+                <h3>TikTok</h3>
+                <p id="tiktok-status" class="platform-status">Nessun account collegato</p>
+            </div>
+        </div>
+        <div id="btn-group-tiktok" class="btn-action-group">
+            <button id="btn-tiktok" class="btn-collega" onclick="gestisciCollegamentoTikTok()">Collega</button>
+        </div>
+    </div>
+
+    <div class="platform-card">
+        <div class="platform-info">
+            <div class="platform-icon">
+                <img src="Images/youtube_logo.png" alt="YouTube" style="width: 42px; height: 42px; border-radius: 8px;">
+            </div>
+            <div class="platform-details">
+                <h3>YouTube</h3>
+                <p id="youtube-status" class="platform-status">Nessun canale collegato</p>
+            </div>
+        </div>
+        <div id="btn-group-youtube" class="btn-action-group">
+            <button id="btn-youtube" class="btn-collega" onclick="gestisciCollegamentoYouTube()">Collega</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-prompt-tiktok" class="prompt-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(10px); justify-content:center; align-items:center; z-index:9999999;">
+    <div class="prompt-box" style="background:#2b2d31; width:420px; padding:28px; border-radius:20px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+        <h2 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 6px;">Collega TikTok</h2>
+        <input type="text" id="input-link-tiktok" placeholder="https://www.tiktok.com/@username" style="width:100%; padding:13px 16px; margin:18px 0; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:10px; outline:none; font-size:14px; transition: 0.2s;">
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button class="btn-modale" onclick="chiudiPromptTikTok()" style="background:rgba(255,255,255,0.08); color:white;">Annulla</button>
+            <button class="btn-modale" onclick="validaEConnettiTikTok()" style="background:#43b581; color:white; box-shadow: 0 4px 12px rgba(67, 181, 129, 0.2);">Conferma</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-prompt-youtube" class="prompt-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(10px); justify-content:center; align-items:center; z-index:9999999;">
+    <div class="prompt-box" style="background:#2b2d31; width:420px; padding:28px; border-radius:20px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+        <h2 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 6px;">Collega YouTube</h2>
+        <input type="text" id="input-link-youtube" placeholder="https://www.youtube.com/@nomecanale o link canale" style="width:100%; padding:13px 16px; margin:18px 0; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:10px; outline:none; font-size:14px; transition: 0.2s;">
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button class="btn-modale" onclick="chiudiPromptYouTube()" style="background:rgba(255,255,255,0.08); color:white;">Annulla</button>
+            <button class="btn-modale" onclick="validaEConnettiYouTube()" style="background:#43b581; color:white; box-shadow: 0 4px 12px rgba(67, 181, 129, 0.2);">Conferma</button>
+        </div>
+    </div>
+</div>

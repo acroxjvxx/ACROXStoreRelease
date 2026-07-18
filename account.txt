@@ -1,0 +1,80 @@
+<style>
+    /* Applica lo stile moderno e gli effetti hover direttamente alle classi esistenti */
+    .card {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 16px !important;
+        padding: 24px 28px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                    background 0.25s ease, 
+                    box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .card h3 {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #ffffff !important;
+        margin-bottom: 4px !important;
+    }
+
+    /* Uniformazione dei Pulsanti della pagina */
+    .aisos-btn {
+        border-radius: 10px !important;
+        border: none !important;
+        cursor: pointer !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 41px !important;
+        padding: 10px 22px !important;
+    }
+
+    /* Pulsante Mostra Password (Secondary) */
+    #btn-mostra-pass {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        color: white !important;
+    }
+
+    #btn-mostra-pass:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* Animazione tattile alla pressione dei pulsanti */
+    .aisos-btn:active {
+        transform: scale(0.97) !important;
+    }
+</style>
+
+<h1>Impostazioni Account</h1>
+
+<div class="card">
+    <h3>Sicurezza Email</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+        <p style="font-size: 16px;">Gmail: <strong id="acc-display-email" style="color: #7289da;">caricamento...</strong></p>
+    </div>
+    <p id="feedback-email" class="feedback-msg"></p>
+</div>
+
+<div class="card">
+    <h3>Sicurezza Password</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+        <p style="font-size: 16px;">Password: <strong id="acc-display-password" style="letter-spacing: 3px; color: #b9bbbe;">*********</strong></p>
+        <div style="display: flex; gap: 10px;">
+            <button class="aisos-btn" style="background: #4f545c;" id="btn-mostra-pass" onclick="avviaMostraPassword()">Mostra</button>
+        </div>
+    </div>
+    <p id="feedback-pass" class="feedback-msg"></p>
+</div>

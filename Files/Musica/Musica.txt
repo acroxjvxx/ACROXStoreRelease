@@ -1,0 +1,165 @@
+
+
+<h1>Libreria Musicale</h1>
+
+<div class="card" style="margin-bottom: 30px; background: rgba(0, 0, 0, 0.15); border: 1px solid rgba(255, 255, 255, 0.05);">
+    <h3 style="margin-bottom: 20px; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; color: rgba(255,255,255,0.95);">Aggiungi un brano alla libreria</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 450px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <input type="text" id="track-title" placeholder="Nome del brano" style="padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.25); color: white; outline: none; font-size: 14px; transition: all 0.2s;" onfocus="this.style.borderColor='rgba(255,255,255,0.25)'; this.style.background='rgba(0,0,0,0.35)';" onblur="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.background='rgba(0,0,0,0.25)';">
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 13px; opacity: 0.6; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">File Audio (MP3)</label>
+            <div style="position: relative; display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.15)';">
+                <span style="font-size: 14px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px;">🎵 <span id="mp3-file-name">Scegli o trascina un file audio...</span></span>
+                <input type="file" id="track-file" accept=".mp3" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" onchange="document.getElementById('mp3-file-name').innerText = this.files[0] ? this.files[0].name : 'Scegli o trascina un file audio...';">
+            </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 13px; opacity: 0.6; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Copertina (PNG, JPG)</label>
+            <div style="position: relative; display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.15)';">
+                <span style="font-size: 14px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px;">🖼️ <span id="cover-file-name">Scegli una copertina opzionale...</span></span>
+                <input type="file" id="track-cover" accept=".png, .jpg, .jpeg" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" onchange="document.getElementById('cover-file-name').innerText = this.files[0] ? this.files[0].name : 'Scegli una copertina opzionale...';">
+            </div>
+        </div>
+        
+        <button id="add-track-btn" style="padding: 12px 20px; background: white; border: none; color: #111; border-radius: 8px; font-weight: 700; margin-top: 8px; transition: all 0.2s ease; font-size: 14px; box-shadow: 0 4px 15px rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='white'; this.style.transform='translateY(0)';">
+            Aggiungi alla Playlist
+        </button>
+    </div>
+    
+    <div id="music-alert" style="margin-top: 20px; padding: 12px 16px; border-radius: 8px; font-size: 13px; display: none; font-weight: 600; animation: fadeIn 0.3s ease;"></div>
+</div>
+
+<div class="card" id="player-container" style="display: none; flex-direction: column; gap: 16px; padding: 22px 25px; border-radius: 16px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 12px 35px rgba(0,0,0,0.4); margin-bottom: 30px; backdrop-filter: blur(12px);">
+    
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; width: 100%; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px;">
+            <div style="position: relative; width: 54px; height: 54px; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+                <img id="player-cover" src="" style="width: 100%; height: 100%; object-fit: cover; background: rgba(255,255,255,0.05);">
+            </div>
+            <div style="overflow: hidden;">
+                <h4 id="player-title" style="font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">Nessun brano</h4>
+                <p id="player-status" style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin: 0; letter-spacing: 0.3px;">In pausa</p>
+            </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 18px; justify-content: center; flex: 1; min-width: 150px;">
+            <button id="btn-prev" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; padding: 6px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='#fff'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='rgba(255,255,255,0.6)'; this.style.transform='scale(1)';">⏮</button>
+            
+            <button id="btn-play-pause" style="background: white; border: none; color: black; font-size: 16px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(255,255,255,0.1);" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';">▶</button>
+            
+            <button id="btn-next" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; padding: 6px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='#fff'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='rgba(255,255,255,0.6)'; this.style.transform='scale(1)';">⏭</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; justify-content: flex-end; flex: 1; min-width: 160px;">
+            <!-- 🔴 CANALE IPC CORRETTO: Cambiato da 'execute-music-command' a 'music-command' -->
+            <button id="btn-repeat" class="player-opt-btn" onclick="ipcRenderer.send('music-command', { action: 'toggle-repeat' });" title="Ripeti brano" style="background: none; border: none; color: rgba(255,255,255,0.4); font-size: 14px; padding: 4px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">🔁</button>
+            
+            <span id="volume-icon" style="font-size: 14px; opacity: 0.6; user-select: none;">🔊</span>
+            <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5" 
+                   style="flex-grow: 1; max-width: 90px; height: 4px; border-radius: 4px; appearance: none; background: rgba(255,255,255,0.15); cursor: pointer; outline: none;">
+        </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; width: 100%; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px;">
+        <span id="current-time" style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); min-width: 35px; text-align: left; user-select: none;">0:00</span>
+        
+        <input type="range" id="track-progress" min="0" value="0" step="1" 
+               style="flex-grow: 1; height: 4px; border-radius: 4px; appearance: none; background: rgba(255,255,255,0.15); cursor: pointer; outline: none; transition: background 0.1s;">
+        
+        <span id="total-duration" style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); min-width: 35px; text-align: right; user-select: none;">0:00</span>
+    </div>
+</div>
+
+<div class="card" style="background: rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.03);">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <h3 style="font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.95); margin: 0;">I tuoi brani</h3>
+        <button id="edit-library-btn" style="padding: 6px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 6px; font-size: 12px; font-weight: 600; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)';" onmouseout="this.style.background='rgba(255,255,255,0.08)';">Modifica</button>
+    </div>
+    <div id="playlist-container" style="display: flex; flex-direction: column; gap: 8px;">
+        <p id="empty-playlist-msg" style="opacity: 0.5; font-size: 14px; padding: 10px 5px; font-style: italic;">La libreria è vuota. Carica dei file MP3 per iniziare ad ascoltare!</p>
+    </div>
+</div>
+
+<div id="edit-music-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 99999;">
+    <div style="width: 450px; padding: 25px; border-radius: 16px; background: #232428; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <h3 id="edit-modal-title" style="margin-bottom: 8px; font-size: 18px; font-weight: 700; color: white;">Cosa vuoi modificare?</h3>
+        <p id="edit-modal-desc" style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 20px; line-height: 1.4;">Seleziona un'operazione da eseguire sulla tua libreria musicale.</p>
+        
+        <div id="edit-step-1" style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="edit-opt-btn" onclick="setEditAction('remove')" style="width: 100%; text-align: left; padding: 12px 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: #ffb3b3; border-radius: 8px; font-weight: 600; transition: 0.2s;">❌ Rimuovi uno o più brani</button>
+            <button class="edit-opt-btn" onclick="setEditAction('name')" style="width: 100%; text-align: left; padding: 12px 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: white; border-radius: 8px; font-weight: 600; transition: 0.2s;">✏️ Modifica il nome di un brano</button>
+            <button class="edit-opt-btn" onclick="setEditAction('cover')" style="width: 100%; text-align: left; padding: 12px 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: white; border-radius: 8px; font-weight: 600; transition: 0.2s;">🖼️ Modifica l'immagine di un brano</button>
+        </div>
+
+        <div id="edit-step-2" style="display: none; flex-direction: column; gap: 15px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase;">Seleziona il Brano</label>
+                <select id="edit-track-select" style="width: 100%; padding: 10px; border-radius: 8px; background: #111; color: white; border: 1px solid rgba(255,255,255,0.1); outline: none;"></select>
+            </div>
+
+            <div id="container-edit-name" style="display: none; flex-direction: column; gap: 6px;">
+                <label style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase;">Nuovo Nome Brano</label>
+                <input type="text" id="edit-new-name" placeholder="Inserisci il nuovo titolo..." style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.25); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none;">
+            </div>
+
+            <div id="container-edit-cover" style="display: none; flex-direction: column; gap: 6px;">
+                <label style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase;">Nuova Copertina</label>
+                <input type="file" id="edit-new-cover" accept=".png, .jpg, .jpeg" style="color: white; font-size: 14px;">
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button onclick="closeEditModal()" style="border: none; border-radius: 8px; padding: 10px 18px; font-weight: 600; background: rgba(255,255,255,0.08); color: white;">Annulla</button>
+            <button id="edit-confirm-btn" style="display: none; border: none; border-radius: 8px; padding: 10px 18px; font-weight: 600; background: white; color: black;"></button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Stili per il pulsante repeat */
+    #btn-repeat {
+        filter: grayscale(100%) brightness(1.5); /* Rende l'emoji monocromatica e pulita */
+        opacity: 0.4;
+    }
+    #btn-repeat:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+    #btn-repeat.active {
+        filter: none !important; /* Ritorna al colore originale o si illumina */
+        opacity: 1 !important;
+        transform: scale(1.05);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+
+    #volume-control::-webkit-slider-thumb, #track-progress::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        transition: transform 0.1s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    #volume-control::-webkit-slider-thumb:hover, #track-progress::-webkit-slider-thumb:hover {
+        transform: scale(1.4);
+    }
+    #track-progress:hover {
+        background: rgba(255,255,255,0.3) !important;
+    }
+    .edit-opt-btn:hover {
+        background: rgba(255,255,255,0.08) !important;
+        border-color: rgba(255,255,255,0.15) !important;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let audioCtx = null;
+        let selectedSwitchProfile = 'cherry-black';
+        
+        // Volumi globali gestiti dagli interruttori/slider (Default 100% -> valore 1.0)
+        let keyboardVolume = 1.0;
+        let mouseVolume = 1.0;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Sintetizza il suono meccanico in base allo switch e al tipo di tasto
+        function playMechSound(keyType = 'standard') {
+            // Se il volume della tastiera è a 0, non processiamo l'audio
+            if (keyboardVolume <= 0) return;
+
+            initAudioContext();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            
+            // Configurazione acustica base ripristinata ai valori standard
+            let config = {
+                noiseGainVal: 0.06,
+                oscFreq: 120,
+                oscGainVal: 0.15,
+                decayTime: 0.08,
+                clickFreq: 1200,
+                clickGainVal: 0.0,
+                clickDecay: 0.01
+            };
+
+            // 1. Applica il profilo dello switch selezionato con i volumi stock ripristinati
+            if (selectedSwitchProfile === 'cherry-black' || selectedSwitchProfile === 'ink-black' || selectedSwitchProfile === 'black') {
+                config.oscFreq = 85;
+                config.oscGainVal = 0.25;
+                config.noiseGainVal = 0.08;
+                config.decayTime = 0.12;
+                config.clickGainVal = 0.0;
+                config.clickFreq = 300;
+                config.clickDecay = 0.02;
+            } else if (selectedSwitchProfile === 'cherry-blue' || selectedSwitchProfile === 'blue') {
+                config.oscFreq = 160;
+                config.oscGainVal = 0.15;
+                config.noiseGainVal = 0.05;
+                config.decayTime = 0.05;
+                config.clickGainVal = 0.35;
+                config.clickFreq = 3200;
+                config.clickDecay = 0.006;
+            } else if (selectedSwitchProfile === 'cherry-red' || selectedSwitchProfile === 'red') {
+                config.oscFreq = 110;
+                config.oscGainVal = 0.18;
+                config.noiseGainVal = 0.06;
+                config.decayTime = 0.07;
+                config.clickGainVal = 0.0;
+                config.clickFreq = 1000;
+                config.clickDecay = 0.01;
+            } else if (selectedSwitchProfile === 'gateron-brown' || selectedSwitchProfile === 'brown') {
+                config.oscFreq = 135;
+                config.oscGainVal = 0.14;
+                config.noiseGainVal = 0.07;
+                config.decayTime = 0.09;
+                config.clickGainVal = 0.08;
+                config.clickFreq = 700;
+                config.clickDecay = 0.015;
+            }
+
+            // 2. Modifica le proprietà in base al tipo di tasto
+            if (keyType === 'spacebar') {
+                config.oscFreq *= 0.6;       
+                config.oscGainVal *= 1.3;     
+                config.decayTime *= 1.6;      
+                config.noiseGainVal *= 1.2;
+                config.clickFreq *= 0.7;      
+            } else if (keyType === 'modifier' || keyType === 'enter') {
+                config.oscFreq *= 0.8;       
+                config.oscGainVal *= 1.1;
+                config.decayTime *= 1.3;
+            }
+
+            // Applica il moltiplicatore del volume generale della tastiera
+            config.noiseGainVal *= keyboardVolume;
+            config.oscGainVal *= keyboardVolume;
+            config.clickGainVal *= keyboardVolume;
+
+            // --- Generatore di Rumore ---
+            const bufferSize = audioCtx.sampleRate * 0.2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = buffer;
+
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.value = config.oscFreq * 3;
+            noiseFilter.Q.value = 1.0;
+
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(config.noiseGainVal, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + config.decayTime);
+
+            noiseNode.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+
+            // --- Generatore Tonale ---
+            const osc = audioCtx.createOscillator();
+            const oscGain = audioCtx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(config.oscFreq, now);
+            
+            oscGain.gain.setValueAtTime(config.oscGainVal, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.001, now + config.decayTime);
+
+            osc.connect(oscGain);
+            oscGain.connect(audioCtx.destination);
+
+            // --- Generatore Click ---
+            if (config.clickGainVal > 0) {
+                const clickOsc = audioCtx.createOscillator();
+                const clickGain = audioCtx.createGain();
+                
+                clickOsc.type = 'sine';
+                clickOsc.frequency.setValueAtTime(config.clickFreq, now);
+                
+                clickGain.gain.setValueAtTime(config.clickGainVal, now);
+                clickGain.gain.exponentialRampToValueAtTime(0.001, now + config.clickDecay);
+                
+                clickOsc.connect(clickGain);
+                clickGain.connect(audioCtx.destination);
+                
+                clickOsc.start(now);
+                clickOsc.stop(now + config.clickDecay + 0.05);
+            }
+
+            noiseNode.start(now);
+            noiseNode.stop(now + config.decayTime + 0.05);
+            osc.start(now);
+            osc.stop(now + config.decayTime + 0.05);
+        }
+
+        // --- SINTESI AUDIO MOUSE ---
+        function playMouseSound(type) {
+            // Se il volume del mouse è a 0, non processiamo l'audio
+            if (mouseVolume <= 0) return;
+
+            initAudioContext();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+
+            let frequency = 2800;
+            let gainValue = 0.25; // Valore di default ripristinato
+            let decay = 0.015;
+
+            if (type === 'right') {
+                frequency = 3200;
+                gainValue = 0.23;
+                decay = 0.012;
+            } else if (type === 'wheel') {
+                frequency = 1200;
+                gainValue = 0.12;
+                decay = 0.008;
+            }
+
+            // Applica il moltiplicatore del volume generale del mouse
+            gainValue *= mouseVolume;
+
+            const osc = audioCtx.createOscillator();
+            const oscGain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + decay);
+
+            oscGain.gain.setValueAtTime(gainValue, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+            osc.connect(oscGain);
+            oscGain.connect(audioCtx.destination);
+
+            const bufferSize = audioCtx.sampleRate * 0.05;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = buffer;
+
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'highpass';
+            noiseFilter.frequency.value = type === 'wheel' ? 800 : 4000;
+
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(gainValue * 0.4, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+            noiseNode.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+
+            osc.start(now);
+            osc.stop(now + decay + 0.02);
+            noiseNode.start(now);
+            noiseNode.stop(now + decay + 0.02);
+        }
+
+        // --- ASCOLTATORI CANALI IPC ---
+
+        // Riproduzione tastiera e mouse
+        ipcRenderer.on('play-mech-sound-bg', (event, keyType) => { playMechSound(keyType); });
+        ipcRenderer.on('play-mouse-sound-bg', (event, type) => { playMouseSound(type); });
+
+        // Cambio profilo dinamico degli switch
+        ipcRenderer.on('change-mech-profile-bg', (event, profile) => {
+            selectedSwitchProfile = profile;
+        });
+
+        // Ricezione del volume dal Main Process (canale aggiornato per main.js)
+        ipcRenderer.on('change-mech-volume-bg', (event, data) => {
+            // Gestisce sia il passaggio di un valore singolo (float diretto) che di un oggetto {type, value}
+            if (typeof data === 'object' && data !== null) {
+                if (data.type === 'keyboard') {
+                    keyboardVolume = parseFloat(data.value);
+                } else if (data.type === 'mouse') {
+                    mouseVolume = parseFloat(data.value);
+                }
+            } else {
+                // Se dalla UI invii solo un numero, aggiorna il volume della tastiera di default
+                keyboardVolume = parseFloat(data);
+                mouseVolume = parseFloat(data); // Opzionale: li tiene sincronizzati se usi un solo slider
+            }
+        });
+    </script>
+</body>
+</html>

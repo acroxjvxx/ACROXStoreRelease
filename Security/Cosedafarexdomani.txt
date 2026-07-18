@@ -1,0 +1,40 @@
+Settings.html
+
+badge: 3 giorni/15 giorni/1 mese
+
+tasti: Mechvibes
+
+dispositivi:
+
+-------------------------------------------------------------------------------------------------------------------
+
+In Profilecustom.html
+
+
+neon del nome
+
+-------------------------------------------------------------------------------------------------------------------
+             
+Index.html - Games
+
+
+
+sistemare Barra di ricerca (scrivendo A esce il gioco che inizia anche con M)
+
+Componenti FPS rileva gioco
+
+Aggiungere Giochi AISOS
+
+Pulsante Edit con tute funzioni giuste
+
+games.txt deve leggere i giochi
+
+Meccha Chameleon troppe immagini nere
+
+-------------------------------------------------------------------------------------------------------------------
+
+Index.html
+
+Fare Tutorial_Games.mp4 Per Games
+
+-------------------------------------------------------------------------------------------------------------------

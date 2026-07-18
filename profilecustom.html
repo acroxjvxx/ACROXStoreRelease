@@ -12,11 +12,6 @@
             margin: 0; 
             padding: 0; 
             font-family: 'Fredoka', sans-serif; 
-            /* Disabilita la selezione del testo ovunque */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
         }
         body { 
             height: 100vh; 
@@ -27,6 +22,10 @@
             position: relative; 
             opacity: 0; 
             transition: opacity 0.15s ease-in-out; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         /* Scrollbar Personalizzata */
@@ -67,6 +66,59 @@
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .bio-counter { font-size: 12px; opacity: 0.5; font-weight: 600; }
 
+        /* Label Flex per icona informativa */
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Tooltip Professionale */
+        .info-tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: help;
+            transition: background 0.2s, color 0.2s;
+        }
+        .info-tooltip:hover {
+            background: var(--theme-accent, #7289da);
+            color: #fff;
+        }
+        .info-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 135%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #111112;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 999;
+        }
+        .info-tooltip:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* Input standard */
         input, textarea { 
             width: 100%; 
             padding: 10px; 
@@ -76,15 +128,84 @@
             color: white; 
             margin-top: 5px; 
             margin-bottom: 15px; 
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+            pointer-events: auto !important;
         }
-        /* Disabilita il ridimensionamento manuale e nasconde totalmente la barra dello scroll */
         .in-bio-textarea { height: 100px; resize: none; overflow: hidden; }
 
-        /* Contenitore Selettore Tema Stile Discord Nitro */
+        /* Contenitore Nome Utente */
+        .inline-edit-container {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding-right: 6px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .inline-edit-container.editing-mode {
+            border-color: var(--theme-accent, #7289da);
+            background: rgba(0, 0, 0, 0.35);
+        }
+        .db-at-prefix {
+            padding-left: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            user-select: none;
+        }
+        .inline-edit-input {
+            border: none !important;
+            background: transparent !important;
+            margin: 0 !important;
+            padding: 10px 6px !important;
+            flex-grow: 1;
+            outline: none;
+            color: white;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .inline-edit-input[readonly] {
+            opacity: 0.7;
+            cursor: default;
+            user-select: none !important;
+            pointer-events: none !important;
+        }
+        .inline-edit-btn {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .inline-edit-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .inline-edit-container.editing-mode .inline-edit-btn {
+            color: var(--theme-success, #2ecc71);
+            background: rgba(46, 204, 113, 0.15);
+        }
+        .inline-edit-container.editing-mode .inline-edit-btn:hover {
+            background: rgba(46, 204, 113, 0.25);
+        }
+        .inline-edit-btn.loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Contenitore Selettore Tema */
         .editor-theme-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.15); padding: 15px; border-radius: 8px; }
         .editor-dots-wrapper { display: flex; gap: 15px; margin-top: 5px; }
         .color-picker-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
@@ -96,7 +217,7 @@
         .preview-area { width: 350px; padding: 50px; background: rgba(0,0,0,0.1); border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; display: flex; flex-direction: column; }
         .preview-title { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Card Bio - Ridotta altezza totale e armonizzata */
+        /* Card Preview */
         .card-p { background: #2f3136; border-radius: 8px; overflow: hidden; border: 1px solid #111112; transition: background 0.3s ease; position: relative; padding-bottom: 10px; height: 360px; display: flex; flex-direction: column; }
         .card-p.active-profile { box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); border-color: var(--theme-accent, #7289da); }
         .banner-p { height: 120px; background: #333; position: relative; background-position: center; background-size: cover; border: none; flex-shrink: 0; }
@@ -111,10 +232,8 @@
         .p-pro-style { opacity: 0.6; font-size: 14px; font-weight: 400; display: inline-block; vertical-align: baseline; }
         .p-user-style { font-size: 15px; opacity: 0.7; margin-top: 2px; margin-bottom: 8px; word-break: break-word; }
 
-        /* Rimossa totalmente la barra di scroll verticale sulla biografia dell'anteprima (a destra) */
         .p-bio-style { padding: 8px 16px 16px 16px; font-size: 14px; opacity: 0.9; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; margin-top: 5px; border: none; display: block; flex-grow: 1; max-height: 120px; overflow: hidden; }
         
-        /* Sizing perfetto per le emoji inserite nella bio */
         .p-bio-style .bio-custom-emoji {
             width: 22px;
             height: 22px;
@@ -143,13 +262,86 @@
         .notification-toast.error { border-left-color: var(--theme-error, #f04747); }
         .notification-toast.success { border-left-color: var(--theme-success, #43b581); }
 
-        .crop-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-        .crop-container { background: #2f3136; padding: 25px; border-radius: 12px; max-width: 90%; width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .crop-box-wrapper { position: relative; width: 100%; height: 300px; overflow: hidden; background: #1e1f22; border-radius: 6px; cursor: grab; display: flex; align-items: center; justify-content: center; }
-        .crop-box-wrapper.shape-avatar { border-radius: 50%; }
-        .crop-box-wrapper.shape-banner { border-radius: 6px; }
-        .crop-btn-confirm { background: var(--theme-success, #2ecc71); color: white; border: none; padding: 10px 24px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 13px; z-index: 5; }
-        .crop-btn-confirm:hover { filter: brightness(1.1); }
+        /* Modal di Conferma Professionale */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-box {
+            background: #2f3136;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            transform: scale(0.9);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.show .modal-box {
+            transform: scale(1);
+        }
+        .modal-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .modal-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        .btn-confirm {
+            background: var(--theme-success, #2ecc71);
+            color: white;
+        }
+        .btn-confirm:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 0 12px rgba(46, 204, 113, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -158,14 +350,15 @@
         <span id="toast-message">Messaggio di notifica</span>
     </div>
 
-    <div id="crop-modal" class="crop-modal">
-        <div class="crop-container">
-            <h3>Adatta e Ridimensiona File</h3>
-            <p style="font-size: 13px; opacity: 0.7; text-align: center; margin-top: -10px;">Trascina o usa le FRECCE della tastiera per posizionare l'immagine.</p>
-            <div id="crop-wrapper" class="crop-box-wrapper">
-                <img id="crop-image-preview" class="crop-image-render" src="" style="transform: translate(0px, 0px);">
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">⚙️</div>
+            <h3 class="modal-title">Modifica Nome Utente</h3>
+            <p class="modal-text">Sei sicuro di voler cambiare il tuo nome utente? Questa operazione aggiornerà il tuo identificativo univoco all'interno del database.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" id="modal-cancel-btn">No, Annulla</button>
+                <button class="modal-btn btn-confirm" id="modal-confirm-btn">Sì, Conferma</button>
             </div>
-            <button class="crop-btn-confirm" onclick="confirmCrop()">Conferma e Ritaglia</button>
         </div>
     </div>
 
@@ -207,10 +400,16 @@
                     <div class="color-circle" style="background: #9b59b6;" onclick="changeBannerColor('#9b59b6', 1)"></div>
                 </div>
                 
-                <label>Nome</label>
-                <input type="text" id="in-name-1" oninput="updatePreview(1)">
-                <label>Nome Utente</label>
-                <input type="text" id="in-user-1" oninput="updatePreview(1)">
+                <label>Nome <span class="info-tooltip" data-tooltip="Massimo 10 caratteri consentiti per il nome">!</span></label>
+                <input type="text" id="in-name-1" maxlength="10" oninput="updatePreview(1)">
+                
+                <label>Nome Utente <span class="info-tooltip" data-tooltip="Massimo 10 caratteri consentiti per il nome utente">!</span></label>
+                <div class="inline-edit-container" id="user-container-1">
+                    <span class="db-at-prefix">@</span>
+                    <input type="text" id="in-user-1" class="inline-edit-input" value="nomeutente" maxlength="10" readonly oninput="updatePreview(1, true)" onkeydown="handleUserKeydown(event, 1)">
+                    <button type="button" class="inline-edit-btn" id="btn-edit-user-1" onclick="toggleUserEdit(1)">✎</button>
+                </div>
+
                 <label>Pronomi</label>
                 <input type="text" id="in-pro-1" oninput="updatePreview(1)">
                 
@@ -254,10 +453,16 @@
                     </div>
                 </div>
                 
-                <label>Nome</label>
-                <input type="text" id="in-name-2" oninput="updatePreview(2)">
-                <label>Nome Utente</label>
-                <input type="text" id="in-user-2" oninput="updatePreview(2)">
+                <label>Nome <span class="info-tooltip" data-tooltip="Massimo 10 caratteri consentiti per il nome">!</span></label>
+                <input type="text" id="in-name-2" maxlength="10" oninput="updatePreview(2)">
+                
+                <label>Nome Utente <span class="info-tooltip" data-tooltip="Massimo 10 caratteri consentiti per il nome utente">!</span></label>
+                <div class="inline-edit-container" id="user-container-2">
+                    <span class="db-at-prefix">@</span>
+                    <input type="text" id="in-user-2" class="inline-edit-input" value="nomeutente" maxlength="10" readonly oninput="updatePreview(2, true)" onkeydown="handleUserKeydown(event, 2)">
+                    <button type="button" class="inline-edit-btn" id="btn-edit-user-2" onclick="toggleUserEdit(2)">✎</button>
+                </div>
+
                 <label>Pronomi</label>
                 <input type="text" id="in-pro-2" oninput="updatePreview(2)">
                 
@@ -318,13 +523,13 @@
     </div>
 
     <script>
+        const { ipcRenderer } = require('electron');
+
         let tempAvatar1 = null;
         let tempAvatar2 = null;
         let tempBanner2 = null;
-        let currentCropTask = null;
-        let isDragging = false;
-        let startX, startY;
-        let translateX = 0, translateY = 0;
+        let isDbSyncing = false;
+        let isSyncingInputs = false; // Flag per evitare loop ricorsivi di sincronizzazione
 
         function showNotification(text, type = 'success') {
             const toast = document.getElementById('toast-notification');
@@ -334,30 +539,122 @@
             setTimeout(() => { toast.classList.remove('show'); }, 5000);
         }
 
+        // --- POPUP DI CONFERMA PERSONALIZZATO ---
+        function showConfirmModal(onConfirm, onCancel) {
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.add('show');
+            
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            
+            // Clona i nodi per ripulire eventuali vecchi EventListener
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            
+            newConfirmBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
+                if (onConfirm) onConfirm();
+            });
+            
+            newCancelBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
+                if (onCancel) onCancel();
+            });
+        }
+
+        // --- GESTIONE NOME UTENTE EDIT-IN-PLACE CON PENNA ---
+        function toggleUserEdit(blockNum) {
+            const container = document.getElementById('user-container-' + blockNum);
+            const input = document.getElementById('in-user-' + blockNum);
+            const button = document.getElementById('btn-edit-user-' + blockNum);
+
+            if (input.hasAttribute('readonly')) {
+                // Sblocca input
+                input.removeAttribute('readonly');
+                container.classList.add('editing-mode');
+                button.innerText = '✓';
+                input.focus();
+                
+                // Sposta cursore alla fine del testo
+                const val = input.value;
+                input.value = '';
+                input.value = val;
+            } else {
+                // Blocca e salva
+                saveUserMode(blockNum, container, input, button);
+            }
+        }
+
+        function handleUserKeydown(event, blockNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const container = document.getElementById('user-container-' + blockNum);
+                const input = document.getElementById('in-user-' + blockNum);
+                const button = document.getElementById('btn-edit-user-' + blockNum);
+                saveUserMode(blockNum, container, input, button);
+            }
+        }
+
+        function saveUserMode(blockNum, container, input, button) {
+            let processedVal = input.value.trim().toLowerCase().replace(/\s+/g, '');
+            if (!processedVal) {
+                processedVal = "nomeutente";
+            }
+
+            const oldUsername = localStorage.getItem('userId_' + blockNum) || "nomeutente";
+
+            // Se l'utente non ha cambiato nulla, chiudi l'editor senza mostrare il popup
+            if (processedVal === oldUsername) {
+                input.value = processedVal;
+                input.setAttribute('readonly', 'readonly');
+                container.classList.remove('editing-mode');
+                button.innerText = '✎';
+                updatePreview(blockNum, true);
+                return;
+            }
+
+            // Mostra il popup di conferma professionale prima di procedere
+            showConfirmModal(() => {
+                // Se clicca SI: applichiamo il cambio e sincronizziamo online
+                input.value = processedVal;
+                input.setAttribute('readonly', 'readonly');
+                container.classList.remove('editing-mode');
+                button.innerText = '✎';
+                
+                syncUsername(blockNum, processedVal);
+            }, () => {
+                // Se clicca NO: annulliamo il cambio, ripristiniamo il vecchio valore e chiudiamo l'editor
+                input.value = oldUsername;
+                input.setAttribute('readonly', 'readonly');
+                container.classList.remove('editing-mode');
+                button.innerText = '✎';
+                updatePreview(blockNum, true);
+            });
+        }
+
         function togglePalette(id) {
             const el = document.getElementById(id);
             el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        // Calcola la lunghezza della bio considerando il peso speciale delle Emoji (NATIVE + CUSTOM :nome:)
         function calcolaLunghezzaBio(testo) {
             let conteggio = 0;
             const emojiSalvate = JSON.parse(localStorage.getItem('acrox_emoji_list')) || [];
             let tempTesto = testo;
 
-            // 1. Riconosce e calcola le emoji custom salvate nella lista (es: :nome_emoji:)
             emojiSalvate.forEach(emoji => {
                 if (emoji.nome) {
                     const regex = new RegExp(emoji.nome.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
                     const match = tempTesto.match(regex);
                     if (match) {
                         conteggio += match.length * 25;
-                        tempTesto = tempTesto.replace(regex, ''); // Rimuove per non ricalcolarle
+                        tempTesto = tempTesto.replace(regex, '');
                     }
                 }
             });
 
-            // 2. Riconosce e calcola le emoji native di sistema (Unicode standard)
             const regexEmojiNative = /[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F191}-\u{1F251}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu;
             const matchNative = tempTesto.match(regexEmojiNative);
             if (matchNative) {
@@ -365,21 +662,17 @@
                 tempTesto = tempTesto.replace(regexEmojiNative, '');
             }
 
-            // 3. Tutto il resto (lettere, spazi, invii) vale 1 ad elemento
             conteggio += Array.from(tempTesto).length;
             return conteggio;
         }
 
-        // Controlla e limita l'inserimento di caratteri se si supera il valore di 143 o l'altezza visiva dell'invio
         function checkBioLimit(e, blockNum) {
             const tastiConsentiti = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Control', 'Meta', 'a', 'c', 'x', 'v'];
             
-            // Permetti sempre i tasti di controllo di sistema
             if (tastiConsentiti.includes(e.key) || e.ctrlKey || e.metaKey) {
                 return;
             }
 
-            // Se l'utente clicca Invio, blocca se l'altezza del testo supera già la visualizzazione dell'editor
             if (e.key === 'Enter') {
                 if (e.target.scrollHeight > e.target.clientHeight) {
                     e.preventDefault();
@@ -387,10 +680,7 @@
                 }
             }
 
-            // Calcola il peso attuale prima dell'inserimento del tasto premuto
             const pesoTotale = calcolaLunghezzaBio(e.target.value);
-            
-            // Se si è già a 143 o più, impedisce l'aggiunta di nuove lettere
             if (pesoTotale >= 143) {
                 e.preventDefault();
             }
@@ -424,11 +714,79 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
+        function syncUsername(blockNum, forceVal) {
+            if (isDbSyncing) return;
+
+            const input = document.getElementById('in-user-' + blockNum);
+            const button = document.getElementById('btn-edit-user-' + blockNum);
+            const oldUsername = localStorage.getItem('userId_' + blockNum) || "nomeutente";
+            const newUsername = forceVal || input.value.trim().toLowerCase();
+
+            if (newUsername === oldUsername) {
+                updatePreview(blockNum, true);
+                return;
+            }
+
+            isDbSyncing = true;
+            button.innerText = "⏳";
+            button.classList.add('loading');
+
+            ipcRenderer.invoke('change-username-database', { oldUsername, newUsername }).then(response => {
+                button.innerText = "✎";
+                button.classList.remove('loading');
+                isDbSyncing = false;
+
+                if (response.success) {
+                    localStorage.setItem('userId_1', newUsername);
+                    localStorage.setItem('userId_2', newUsername);
+                    updatePreview(blockNum, true);
+                    showNotification("Nome utente sincronizzato online!");
+                } else {
+                    input.value = oldUsername;
+                    updatePreview(blockNum, true);
+                    showNotification("Errore di sincronizzazione: " + response.error, "error");
+                }
+            }).catch(err => {
+                button.innerText = "✎";
+                button.classList.remove('loading');
+                isDbSyncing = false;
+                input.value = oldUsername;
+                updatePreview(blockNum, true);
+                showNotification("Impossibile connettersi al database.", "error");
+            });
+        }
+
         function updatePreview(blockNum, isSilent = false) {
+    // Recupera l'input del Nome Utente corrente
+    const userInput = document.getElementById('in-user-' + blockNum);
+    if (userInput) {
+        // Applica la stessa regex di configurazione.html per rimuovere i caratteri speciali
+        userInput.value = userInput.value.replace(/[^a-zA-Z0-9a-zàèìòùÀÈÌÒÙ\s\-_]/g, '');
+    }
+
+    if (!isSyncingInputs) {
+        isSyncingInputs = true;
+        const otherBlock = blockNum === 1 ? 2 : 1;
+        
+        const currentName = document.getElementById('in-name-' + blockNum).value;
+        const currentUsername = document.getElementById('in-user-' + blockNum).value;
+        
+        document.getElementById('in-name-' + otherBlock).value = currentName;
+        document.getElementById('in-user-' + otherBlock).value = currentUsername;
+
+        renderSingleBlockPreview(otherBlock);
+        isSyncingInputs = false;
+    }
+
+    renderSingleBlockPreview(blockNum);
+    
+    if(!isSilent) document.getElementById('save-bar').style.display = 'flex';
+}
+
+        function renderSingleBlockPreview(blockNum) {
             let bioTextArea = document.getElementById('in-bio-' + blockNum);
             let bioValue = bioTextArea.value;
 
-            // Ulteriore barriera di sicurezza per i "copia e incolla" massivi o per sforamenti di invio
             let pesoCaratteri = calcolaLunghezzaBio(bioValue);
             if (pesoCaratteri > 143) {
                 while (calcolaLunghezzaBio(bioValue) > 143 && bioValue.length > 0) {
@@ -438,7 +796,6 @@
                 pesoCaratteri = calcolaLunghezzaBio(bioValue);
             }
 
-            // Impedisce l'aggiunta di testo se l'altezza complessiva supera il box visivo
             if (bioTextArea.scrollHeight > bioTextArea.clientHeight) {
                 while (bioTextArea.scrollHeight > bioTextArea.clientHeight && bioValue.length > 0) {
                     bioValue = bioValue.slice(0, -1);
@@ -447,14 +804,15 @@
                 pesoCaratteri = calcolaLunghezzaBio(bioValue);
             }
 
-            const nameValue = document.getElementById('in-name-' + blockNum).value || 'Nome Utente';
-            const userValue = document.getElementById('in-user-' + blockNum).value ? `@${document.getElementById('in-user-' + blockNum).value}` : '@nomeutente';
+            const nameInput = document.getElementById('in-name-' + blockNum);
+            const nameValue = nameInput.value || 'Nome Utente';
+
+            const rawUser = document.getElementById('in-user-' + blockNum).value.substring(0, 10) || 'nomeutente';
+            const userValue = `@${rawUser}`;
             const proValue = document.getElementById('in-pro-' + blockNum).value ? `${document.getElementById('in-pro-' + blockNum).value}` : '';
 
-            // Aggiornamento contatore dinamico dei caratteri
             const contatoreElement = document.getElementById('bio-counter-' + blockNum);
-            contatoreElement.innerText = `${pesoCaratteri}/143`;
-            contatoreElement.style.color = 'rgba(255, 255, 255, 0.5)';
+            if (contatoreElement) contatoreElement.innerText = `${pesoCaratteri}/143`;
 
             document.getElementById('p-name-' + blockNum).innerText = nameValue;
             document.getElementById('p-username-display-' + blockNum).innerText = userValue;
@@ -485,7 +843,6 @@
             if (parseInt(activeProfileType) === blockNum) {
                 document.getElementById('sidebar-username').innerText = nameValue;
             }
-            if(!isSilent) document.getElementById('save-bar').style.display = 'flex';
         }
 
         function handleImageUpload(input, blockNum, elementTarget) {
@@ -539,7 +896,7 @@
             localStorage.setItem('active_profile_type', tipo);
             const nameValue = document.getElementById('in-name-' + tipo).value || 'Nome Utente';
             localStorage.setItem('global_active_username', nameValue);
-            localStorage.setItem('global_active_userId', document.getElementById('in-user-' + tipo).value || "nomeutente");
+            localStorage.setItem('global_active_userId', document.getElementById('in-user-' + tipo).value || localStorage.getItem('userId_' + tipo) || "nomeutente");
             localStorage.setItem('global_active_pronouns', document.getElementById('in-pro-' + tipo).value || "");
             localStorage.setItem('global_active_bio', document.getElementById('in-bio-' + tipo).value || "");
             
@@ -581,15 +938,18 @@
                 return;
             }
 
-            localStorage.setItem('username_1', document.getElementById('in-name-1').value);
-            localStorage.setItem('userId_1', document.getElementById('in-user-1').value);
+            const syncedName = document.getElementById('in-name-1').value.substring(0, 10);
+            const syncedUser = document.getElementById('in-user-1').value.substring(0, 10);
+
+            localStorage.setItem('username_1', syncedName);
+            localStorage.setItem('userId_1', syncedUser);
             localStorage.setItem('pronouns_1', document.getElementById('in-pro-1').value);
             localStorage.setItem('userBio_1', document.getElementById('in-bio-1').value);
             localStorage.setItem('bannerColor_1', document.getElementById('p-banner-1').style.backgroundColor);
             if (tempAvatar1) localStorage.setItem('profileImage_1', tempAvatar1);
 
-            localStorage.setItem('username_2', document.getElementById('in-name-2').value);
-            localStorage.setItem('userId_2', document.getElementById('in-user-2').value);
+            localStorage.setItem('username_2', syncedName);
+            localStorage.setItem('userId_2', syncedUser);
             localStorage.setItem('pronouns_2', document.getElementById('in-pro-2').value);
             localStorage.setItem('userBio_2', document.getElementById('in-bio-2').value);
             if (tempBanner2) localStorage.setItem('bannerImage_2', tempBanner2);
@@ -600,6 +960,7 @@
 
             const currentActive = localStorage.getItem('active_profile_type') || '1';
             impostaProfilo(parseInt(currentActive));
+
             document.getElementById('save-bar').style.display = 'none';
             showNotification('Tutte le modifiche sono state salvate con successo!');
         }
@@ -611,8 +972,11 @@
         }
 
         function loadAllDataFromStorage() {
-            document.getElementById('in-name-1').value = localStorage.getItem('username_1') || "";
-            document.getElementById('in-user-1').value = localStorage.getItem('userId_1') || "";
+            const defaultName = localStorage.getItem('username_1') || localStorage.getItem('username_2') || "Nome Utente";
+            const defaultUser = localStorage.getItem('userId_1') || localStorage.getItem('userId_2') || "nomeutente";
+
+            document.getElementById('in-name-1').value = defaultName.substring(0, 10);
+            document.getElementById('in-user-1').value = defaultUser.substring(0, 10);
             document.getElementById('in-pro-1').value = localStorage.getItem('pronouns_1') || "";
             document.getElementById('in-bio-1').value = localStorage.getItem('userBio_1') || "";
             const bc1 = localStorage.getItem('bannerColor_1') || "#333";
@@ -623,8 +987,8 @@
             document.getElementById('p-avatar-1').src = avatar1;
             tempAvatar1 = localStorage.getItem('profileImage_1');
 
-            document.getElementById('in-name-2').value = localStorage.getItem('username_2') || "";
-            document.getElementById('in-user-2').value = localStorage.getItem('userId_2') || "";
+            document.getElementById('in-name-2').value = defaultName.substring(0, 10);
+            document.getElementById('in-user-2').value = defaultUser.substring(0, 10);
             document.getElementById('in-pro-2').value = localStorage.getItem('pronouns_2') || "";
             document.getElementById('in-bio-2').value = localStorage.getItem('userBio_2') || "";
             
@@ -647,6 +1011,15 @@
             document.getElementById('picker-1').value = localStorage.getItem('saved_mix_c1') || "#7289da";
             document.getElementById('picker-2').value = localStorage.getItem('saved_mix_c2') || "#2c2f33";
             updateLiveMixColor(true);
+
+            for (let b of [1, 2]) {
+                const container = document.getElementById('user-container-' + b);
+                const input = document.getElementById('in-user-' + b);
+                const button = document.getElementById('btn-edit-user-' + b);
+                input.setAttribute('readonly', 'readonly');
+                container.classList.remove('editing-mode');
+                button.innerText = '✎';
+            }
 
             updatePreview(1, true);
             updatePreview(2, true);

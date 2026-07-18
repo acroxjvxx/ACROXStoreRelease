@@ -1,48 +1,247 @@
-<div class="home-section" style="padding: 24px; color: white; animation: premiumFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
-    <!-- Banner di Benvenuto -->
-    <div style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(0, 0, 0, 0.6)); padding: 40px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(30px); margin-bottom: 32px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-        <h1 style="font-size: 38px; font-weight: 700; margin-bottom: 12px; background: linear-gradient(45deg, #ff7b00, #ff007f, #8a2be2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Benvenuto su AISOS</h1>
-        <p style="font-size: 16px; color: rgba(255, 255, 255, 0.7); max-width: 600px; margin: 0 auto; line-height: 1.6;">
-            Il tuo hub definitivo per il gaming di nuova generazione. Esplora tutte le potenzialità della nostra piattaforma progettata per darti il massimo del controllo e del divertimento.
+<div class="home-section" style="padding: 24px; color: white; position: relative; overflow: hidden; font-family: system-ui, -apple-system, sans-serif;">
+    
+    <!-- Stili e Animazioni avanzate per una Dashboard Ultra-Figa -->
+    <style>
+        /* Animazione d'ingresso della Home */
+        .home-section {
+            animation: premiumFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Sfondi con gradienti pulsanti */
+        .home-bg-glows {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .home-glow-1 {
+            position: absolute;
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, transparent 70%);
+            top: -10%; right: 10%;
+            filter: blur(100px);
+            animation: homeGlowFloat 14s ease-in-out infinite alternate;
+        }
+        .home-glow-2 {
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.1) 0%, transparent 70%);
+            bottom: -5%; left: 5%;
+            filter: blur(90px);
+            animation: homeGlowFloat 10s ease-in-out infinite alternate-reverse;
+        }
+
+        /* Banner di Benvenuto Immersivo */
+        .welcome-hero-banner {
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(13, 13, 17, 0.75));
+            padding: 50px 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            margin-bottom: 32px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        .welcome-hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -50%; width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transform: skewX(-25deg);
+            animation: bannerShineLoop 8s infinite linear;
+        }
+
+        .welcome-emoji-float {
+            font-size: 42px;
+            display: inline-block;
+            margin-bottom: 12px;
+            animation: floatWelcomeEmoji 3.5s ease-in-out infinite;
+        }
+
+        /* Griglia delle Funzionalità */
+        .home-grid-features {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Card Effetto Vetro Interattivo */
+        .feature-card-premium {
+            background: rgba(18, 18, 22, 0.4);
+            padding: 28px 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Effetti Glow Personalizzati sui Bordi al passaggio */
+        .feature-card-premium::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, var(--card-glow-color, rgba(255,255,255,0.15)), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .feature-card-premium:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--card-border-hover);
+            box-shadow: 0 20px 40px var(--card-shadow-hover);
+        }
+
+        .feature-card-premium:hover::after {
+            opacity: 0.15;
+        }
+
+        .feature-card-premium > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hover Animazioni per le singole icone delle card */
+        .feature-card-premium:hover .card-emoji-anim {
+            animation: cardEmojiPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        /* Box Avviso Alpha Super Soft */
+        .alpha-warning-box {
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(90deg, rgba(255, 123, 0, 0.06) 0%, rgba(13, 13, 17, 0.4) 100%);
+            border-left: 4px solid #ff7b00;
+            border-top: 1px solid rgba(255, 123, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 123, 0, 0.1);
+            border-right: 1px solid rgba(255, 123, 0, 0.1);
+            padding: 24px;
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .alpha-warning-box:hover {
+            transform: scale(1.005);
+        }
+
+        .warning-emoji-pulse {
+            font-size: 24px;
+            animation: warningPulse 1.8s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        /* KEYFRAMES */
+        @keyframes premiumFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes homeGlowFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-20px, 30px) scale(1.15); }
+        }
+        @keyframes bannerShineLoop {
+            0% { left: -150%; }
+            50% { left: 150%; }
+            100% { left: 150%; }
+        }
+        @keyframes floatWelcomeEmoji {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(6deg); }
+        }
+        @keyframes cardEmojiPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25) rotate(-8deg); }
+            100% { transform: scale(1); }
+        }
+        @keyframes warningPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.15) rotate(5deg); opacity: 0.8; }
+        }
+    </style>
+
+    <!-- Luci di Sfondo Animate -->
+    <div class="home-bg-glows">
+        <div class="home-glow-1"></div>
+        <div class="home-glow-2"></div>
+    </div>
+
+    <!-- Banner di Benvenuto Immersivo -->
+    <div class="welcome-hero-banner">
+        <div class="welcome-emoji-float">🚀</div>
+        <h1 style="font-size: 42px; font-weight: 800; margin: 0 0 12px 0; letter-spacing: -1px; background: linear-gradient(135deg, #ff7b00 10%, #ff007f 50%, #8a2be2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Benvenuto su AISOS!
+        </h1>
+        <p style="font-size: 16px; color: rgba(228, 228, 231, 0.75); max-width: 620px; margin: 0 auto; line-height: 1.7; font-weight: 500;">
+            Il tuo hub definitivo per il gaming di nuova generazione. Esplora tutte le potenzialità della nostra piattaforma progettata per darti il massimo del controllo, della fluidità e del divertimento.
         </p>
     </div>
 
-    <!-- Griglia delle Funzionalità -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px;">
-        <!-- Card 1 -->
-        <div style="background: rgba(18, 18, 22, 0.45); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); transition: transform 0.3s ease;">
-            <div style="font-size: 32px; margin-bottom: 12px;">🎮</div>
-            <h3 style="font-size: 18px; margin-bottom: 8px; color: #ff7b00;">Installa Giochi</h3>
-            <p style="font-size: 13px; color: rgba(255, 255, 255, 0.6); line-height: 1.4;">Accedi alla nostra libreria d'élite, scarica ed avvia i tuoi titoli preferiti in un click.</p>
+    <!-- Griglia delle Funzionalità con Hover a Colore Dinamico -->
+    <div class="home-grid-features">
+        
+        <!-- Card 1 (Giochi) -->
+        <div class="feature-card-premium" style="--card-glow-color: rgba(255, 123, 0, 0.3); --card-border-hover: rgba(255, 123, 0, 0.35); --card-shadow-hover: rgba(255, 123, 0, 0.15);">
+            <div class="card-emoji-anim" style="font-size: 36px; display: inline-block;">🎮</div>
+            <h3 style="font-size: 19px; font-weight: 700; margin: 0; color: #ff7b00; letter-spacing: -0.3px;">Installa Giochi</h3>
+            <p style="font-size: 13px; color: rgba(228, 228, 231, 0.6); line-height: 1.5; margin: 0;">
+                Accedi alla nostra libreria d'élite, scarica ed avvia tutti i tuoi titoli preferiti in un solo clic.
+            </p>
         </div>
-        <!-- Card 2 -->
-        <div style="background: rgba(18, 18, 22, 0.45); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); transition: transform 0.3s ease;">
-            <div style="font-size: 32px; margin-bottom: 12px;">📹</div>
-            <h3 style="font-size: 18px; margin-bottom: 8px; color: #ff007f;">Registra Clip</h3>
-            <p style="font-size: 13px; color: rgba(255, 255, 255, 0.6); line-height: 1.4;">Cattura i tuoi momenti migliori in gioco con registrazioni fluide e in alta definizione.</p>
+
+        <!-- Card 2 (Clip) -->
+        <div class="feature-card-premium" style="--card-glow-color: rgba(255, 0, 127, 0.3); --card-border-hover: rgba(255, 0, 127, 0.35); --card-shadow-hover: rgba(255, 0, 127, 0.15);">
+            <div class="card-emoji-anim" style="font-size: 36px; display: inline-block;">📹</div>
+            <h3 style="font-size: 19px; font-weight: 700; margin: 0; color: #ff007f; letter-spacing: -0.3px;">Registra Clip</h3>
+            <p style="font-size: 13px; color: rgba(228, 228, 231, 0.6); line-height: 1.5; margin: 0;">
+                Cattura i tuoi momenti migliori in gioco con registrazioni fluide e codec ad alta definizione.
+            </p>
         </div>
-        <!-- Card 3 -->
-        <div style="background: rgba(18, 18, 22, 0.45); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); transition: transform 0.3s ease;">
-            <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
-            <h3 style="font-size: 18px; margin-bottom: 8px; color: #8a2be2;">Condividi</h3>
-            <p style="font-size: 13px; color: rgba(255, 255, 255, 0.6); line-height: 1.4;">Mostra le tue giocate più spettacolari condividendo istantaneamente i video con la community.</p>
+
+        <!-- Card 3 (Condividi) -->
+        <div class="feature-card-premium" style="--card-glow-color: rgba(138, 43, 226, 0.3); --card-border-hover: rgba(138, 43, 226, 0.35); --card-shadow-hover: rgba(138, 43, 226, 0.15);">
+            <div class="card-emoji-anim" style="font-size: 36px; display: inline-block;">⚡</div>
+            <h3 style="font-size: 19px; font-weight: 700; margin: 0; color: #a78bfa; letter-spacing: -0.3px;">Condividi</h3>
+            <p style="font-size: 13px; color: rgba(228, 228, 231, 0.6); line-height: 1.5; margin: 0;">
+                Mostra le tue giocate più spettacolari condividendo all'istante i video con la community.
+            </p>
         </div>
-        <!-- Card 4 -->
-        <div style="background: rgba(18, 18, 22, 0.45); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); transition: transform 0.3s ease;">
-            <div style="font-size: 32px; margin-bottom: 12px;">💬</div>
-            <h3 style="font-size: 18px; margin-bottom: 8px; color: #00bfff;">Chatta con gli Amici</h3>
-            <p style="font-size: 13px; color: rgba(255, 255, 255, 0.6); line-height: 1.4;">Resta in contatto con il tuo team, organizza lobby e messaggia in tempo reale.</p>
+
+        <!-- Card 4 (Chat) -->
+        <div class="feature-card-premium" style="--card-glow-color: rgba(0, 191, 255, 0.3); --card-border-hover: rgba(0, 191, 255, 0.35); --card-shadow-hover: rgba(0, 191, 255, 0.15);">
+            <div class="card-emoji-anim" style="font-size: 36px; display: inline-block;">💬</div>
+            <h3 style="font-size: 19px; font-weight: 700; margin: 0; color: #00bfff; letter-spacing: -0.3px;">Chatta con Amici</h3>
+            <p style="font-size: 13px; color: rgba(228, 228, 231, 0.6); line-height: 1.5; margin: 0;">
+                Resta in contatto con il tuo team, organizza partite e scambia messaggi in tempo reale.
+            </p>
         </div>
     </div>
 
-    <!-- Info Box Stato di Sviluppo -->
-    <div style="background: rgba(255, 123, 0, 0.1); border-left: 4px solid #ff7b00; padding: 20px; border-radius: 0 16px 16px 0; backdrop-filter: blur(20px);">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-            <span style="font-size: 18px;">⚠️</span>
-            <strong style="color: #ff7b00; font-size: 16px;">Nota di Sviluppo Alpha</strong>
+    <!-- Info Box Stato di Sviluppo Dinamico -->
+    <div class="alpha-warning-box">
+        <div class="warning-emoji-pulse">⚠️</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <strong style="color: #ff7b00; font-size: 16px; font-weight: 700; letter-spacing: -0.2px;">Nota di Sviluppo Alpha</strong>
+            <p style="font-size: 13.5px; color: rgba(228, 228, 231, 0.75); line-height: 1.6; margin: 0;">
+                Il launcher è in fase di sviluppo intensivo. Con il prossimo aggiornamento faremo un ulteriore passo in avanti per offrirvi un ecosistema ancora più ricco di funzionalità, ottimizzato per i giochi e altamente personalizzabile! Restate sintonizzati.
+            </p>
         </div>
-        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.8); line-height: 1.5;">
-            Il launcher è ancora in fase di sviluppo attivo. Con il prossimo aggiornamento faremo un ulteriore passo in avanti per offrirvi un ecosistema ancora più ricco di funzionalità, ottimizzato e personalizzabile! Restate sintonizzati.
-        </p>
     </div>
 </div>

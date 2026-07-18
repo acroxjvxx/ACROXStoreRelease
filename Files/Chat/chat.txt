@@ -1,24 +1,257 @@
-<div class="chat-section" style="padding: 24px; color: white; height: 100%; display: flex; align-items: center; justify-content: center; animation: premiumFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
-    <div style="background: rgba(18, 18, 22, 0.45); max-width: 550px; width: 100%; padding: 40px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-        <!-- Icona Stato di Blocco / Manutenzione -->
-        <div style="width: 80px; height: 80px; background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 36px; color: #ff007f;">
+<div class="chat-section" style="padding: 24px; color: white; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; font-family: system-ui, -apple-system, sans-serif;">
+    
+    <!-- Stile CSS incorporato per animazioni avanzate e pulite -->
+    <style>
+        .chat-lock-container {
+            position: relative;
+            z-index: 2;
+            background: rgba(18, 18, 22, 0.45);
+            max-width: 580px;
+            width: 100%;
+            padding: 45px 35px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 0, 127, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            animation: premiumFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Effetti Glow di Sfondo */
+        .chat-bg-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.15) 0%, rgba(138, 43, 226, 0.05) 70%, transparent 100%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 1;
+            animation: chatPulseGlow 8s ease-in-out infinite alternate;
+        }
+
+        /* Icona Lucchetto Animata */
+        .chat-lock-icon-box {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 0, 127, 0.06);
+            border: 1px solid rgba(255, 0, 127, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            color: #ff007f;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.1);
+        }
+
+        .chat-radar-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 0, 127, 0.4);
+            animation: chatRadarPulse 3s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+        }
+
+        .chat-radar-ring-2 {
+            animation-delay: 1s;
+        }
+
+        /* Badge Stato Fluido */
+        .chat-wip-badge {
+            background: rgba(255, 170, 0, 0.08);
+            border: 1px solid rgba(255, 170, 0, 0.25);
+            padding: 6px 14px;
+            border-radius: 100px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            animation: chatBadgePulse 2s ease-in-out infinite;
+        }
+
+        .chat-wip-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ffaa00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffaa00;
+            animation: chatDotBlink 1.5s infinite ease-in-out;
+        }
+
+        /* Griglia Teaser Social */
+        .chat-teaser-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .chat-teaser-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 12px 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .chat-teaser-item:hover {
+            background: rgba(255, 0, 127, 0.03);
+            border-color: rgba(255, 0, 127, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Barra di Caricamento Sviluppo */
+        .chat-progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 8px;
+            border-radius: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-progress-fill {
+            height: 100%;
+            width: 45%;
+            background: linear-gradient(90deg, #ff007f 0%, #8a2be2 100%);
+            border-radius: 100px;
+            position: relative;
+            animation: chatBarAnim 2.2s ease-out forwards;
+        }
+
+        .chat-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
+            animation: chatShine 1.8s infinite linear;
+            background-size: 200% 100%;
+        }
+
+        /* KEYFRAMES */
+        @keyframes premiumFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes chatPulseGlow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.12; }
+            100% { transform: scale(1.15) translate(10px, -10px); opacity: 0.18; }
+        }
+
+        @keyframes chatRadarPulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1.35); opacity: 0; }
+        }
+
+        @keyframes chatBadgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes chatDotBlink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        @keyframes chatBarAnim {
+            from { width: 0%; }
+            to { width: 45%; }
+        }
+
+        @keyframes chatShine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+
+    <!-- Luce Sotto la Card -->
+    <div class="chat-bg-glow"></div>
+
+    <!-- Contenitore della Card -->
+    <div class="chat-lock-container">
+        
+        <!-- Badge di Stato Roadmap -->
+        <div class="chat-wip-badge">
+            <span class="chat-wip-dot"></span>
+            <span style="font-size: 11px; color: rgba(255, 255, 255, 0.85); font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;">In arrivo nell'Update v2.0</span>
+        </div>
+
+        <!-- Icona Lucchetto con onde radar dinamiche -->
+        <div class="chat-lock-icon-box">
+            <div class="chat-radar-ring"></div>
+            <div class="chat-radar-ring chat-radar-ring-2"></div>
             🔒
         </div>
         
-        <!-- Titolo Principale -->
-        <h2 style="font-size: 26px; font-weight: 700; margin-bottom: 12px; background: linear-gradient(45deg, #ff007f, #8a2be2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            Canale non disponibile
-        </h2>
-        
-        <!-- Messaggio Descrittivo -->
-        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.65); line-height: 1.6; margin-bottom: 24px;">
-            La chat globale e il sistema di messaggistica con gli amici sono attualmente in fase di sviluppo. Questo modulo verrà attivato e rilasciato ufficialmente con il prossimo grande aggiornamento del launcher, insieme a molte altre nuove funzionalità ed ottimizzazioni di sistema.
-        </p>
-        
-        <!-- Badge di Stato / Roadmap -->
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 12px 16px; border-radius: 12px; display: inline-flex; align-items: center; gap: 8px;">
-            <span style="width: 8px; height: 8px; background-color: #ffaa00; border-radius: 50%; box-shadow: 0 0 10px #ffaa00;"></span>
-            <span style="font-size: 12px; color: rgba(255, 255, 255, 0.8); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">In arrivo nell'Update v2.0</span>
+        <!-- Titoli e Descrizioni -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(45deg, #ff007f, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">
+                Area Social in Sviluppo
+            </h2>
+            <p style="font-size: 14px; color: rgba(228, 228, 231, 0.65); line-height: 1.6; max-width: 480px; margin: 0 auto;">
+                La chat globale e il sistema di messaggistica con gli amici stanno prendendo forma! Questa sezione verrà sbloccata nel prossimo grande aggiornamento per connetterti all'istante con tutta la community.
+            </p>
+        </div>
+
+        <!-- Barra di progresso dello Sviluppo Social -->
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin: 6px 0;">
+            <div class="chat-progress-container">
+                <div class="chat-progress-fill"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 100%; font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.35);">
+                <span>Infrastruttura Server e WebSocket</span>
+                <span>45% Completato</span>
+            </div>
+        </div>
+
+        <!-- Griglia Anteprima Future Funzioni Social -->
+        <div class="chat-teaser-grid">
+            <div class="chat-teaser-item">
+                <span style="font-size: 22px;">🌍</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #ffffff;">Chat Globale</span>
+                    <span style="font-size: 10px; color: rgba(228, 228, 231, 0.45);">Parla con tutti i player attivi.</span>
+                </div>
+            </div>
+
+            <div class="chat-teaser-item">
+                <span style="font-size: 22px;">👥</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #ffffff;">Lista Amici</span>
+                    <span style="font-size: 10px; color: rgba(228, 228, 231, 0.45);">Vedi a cosa stanno giocando.</span>
+                </div>
+            </div>
+
+            <div class="chat-teaser-item">
+                <span style="font-size: 22px;">🎮</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #ffffff;">Inviti Rapidi</span>
+                    <span style="font-size: 10px; color: rgba(228, 228, 231, 0.45);">Entra nei server con un click.</span>
+                </div>
+            </div>
+
+            <div class="chat-teaser-item">
+                <span style="font-size: 22px;">⚡</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #ffffff;">Notifiche Live</span>
+                    <span style="font-size: 10px; color: rgba(228, 228, 231, 0.45);">Resta aggiornato in tempo reale.</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

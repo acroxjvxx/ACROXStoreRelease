@@ -1,40 +1,54 @@
+<script src="gestoreGiochi.js" defer=""></script>
+<script src="JavaScript/IntelligenzaArtificiale/IA.js" defer=""></script>
+
 <style>
-    /* Layout Principale della Sezione Giochi - Larghezza Originale */
+    /* ==========================================================================
+       1. LAYOUT PRINCIPALE & ANIMAZIONI
+       ========================================================================== */
     .games-section {
         display: flex;
         flex-direction: column;
         gap: 32px;
-        animation: premiumFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: premiumFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Barra Superiore: Estesa e Asimmetrica */
+    @keyframes premiumFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       2. BARRA SUPERIORE (HEADER) & NAVIGAZIONE
+       ========================================================================== */
     .games-header {
         display: grid;
         grid-template-columns: auto 1fr auto;
         align-items: center;
         gap: 24px;
-        background: rgba(18, 18, 22, 0.45);
-        padding: 12px 24px;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        background: rgba(18, 18, 24, 0.6);
+        padding: 14px 28px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         position: relative;
         z-index: 100;
     }
 
-    /* Menu Categorie Trigger (Sinistra) */
     .category-dropdown-wrapper {
         position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .category-trigger-btn {
-        background: rgba(255, 255, 255, 0.02);
-        color: #e4e4e7;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 10px 18px;
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        color: #f4f4f5;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 10px 20px;
+        border-radius: 12px;
         cursor: pointer;
         font-weight: 600;
         font-size: 13px;
@@ -42,38 +56,55 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
     }
 
     .category-trigger-btn:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.18);
         color: #ffffff;
+        transform: translateY(-1px);
     }
 
     .category-trigger-btn span.arrow {
-        font-size: 8px;
-        opacity: 0.4;
+        font-size: 9px;
+        opacity: 0.5;
         transition: transform 0.25s ease;
     }
 
-    /* Menu Categorie */
+    #admin-edit-btn {
+        max-width: 100px;
+        justify-content: center;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        border-color: rgba(99, 102, 241, 0.25);
+        color: #a5b4fc;
+    }
+    
+    #admin-edit-btn:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+        border-color: rgba(99, 102, 241, 0.4);
+        color: #ffffff;
+    }
+
+    /* Menu Dropdown */
     .category-menu {
         display: none;
         flex-direction: column;
         position: absolute;
         top: calc(100% + 8px);
         left: 0;
-        width: 200px;
-        background: rgba(14, 14, 17, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 12px;
-        padding: 6px;
+        width: 210px;
+        background: rgba(10, 10, 12, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 8px;
         z-index: 999;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
         opacity: 0;
-        transform: translateY(-6px);
-        transition: opacity 0.2s ease, transform 0.2s ease;
+        transform: translateY(-8px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
     .category-menu.show {
@@ -84,121 +115,127 @@
 
     .category-item {
         background: transparent;
-        color: rgba(228, 228, 231, 0.65);
+        color: rgba(228, 228, 231, 0.7);
         border: none;
-        padding: 9px 12px;
+        padding: 10px 14px;
         text-align: left;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
         font-size: 13px;
-        transition: all 0.15s ease;
+        transition: all 0.2s ease;
     }
 
     .category-item:hover {
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(255, 255, 255, 0.05);
         color: #ffffff;
+        transform: translateX(3px);
     }
 
     .category-item.active {
-        background: rgba(99, 102, 241, 0.1);
-        color: #818cf8;
+        background: rgba(99, 102, 241, 0.15);
+        color: #a5b4fc;
     }
 
-    /* Barra di Ricerca */
+    /* Barra di Ricerca Premium */
     .search-wrapper {
         position: relative;
         width: 100%;
-        max-width: 280px;
+        max-width: 300px;
         justify-self: center;
-        transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .search-input {
         width: 100%;
-        padding: 10px 16px 10px 38px;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-radius: 10px;
+        padding: 11px 18px 11px 42px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
         color: #ffffff;
         font-size: 13.5px;
         outline: none;
-        transition: all 0.25s ease;
+        transition: all 0.3s ease;
         text-align: center;
     }
 
     .search-input:focus, .search-input:not(:placeholder-shown) {
-        border-color: rgba(99, 102, 241, 0.35);
-        background: rgba(0, 0, 0, 0.35);
+        border-color: rgba(99, 102, 241, 0.4);
+        background: rgba(0, 0, 0, 0.5);
         text-align: left;
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
     }
 
     .search-wrapper:focus-within {
-        max-width: 340px;
+        max-width: 380px;
     }
 
     .search-icon {
         position: absolute;
-        left: 14px;
+        left: 16px;
         top: 50%;
         transform: translateY(-50%);
-        opacity: 0.25;
+        opacity: 0.35;
         pointer-events: none;
-        font-size: 12px;
+        font-size: 13px;
+        transition: opacity 0.3s ease;
+    }
+    
+    .search-input:focus + .search-icon {
+        opacity: 0.7;
     }
 
-    /* Gruppo Azioni Destra */
+    /* Hamburger & Right Actions */
     .right-actions-wrapper {
         justify-self: end;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
         position: relative;
     }
 
-    /* Bottone IA */
     .ia-avatar-btn {
-        width: 36px;
-        height: 36px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 1px;
+        background: url('Images/IA.gif') no-repeat center;
+        background-size: cover;
+        border: 2px solid rgba(167, 139, 250, 0.3);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
+        box-shadow: 0 0 15px rgba(167, 139, 250, 0.25);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .ia-avatar-btn img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
+    .ia-avatar-btn:hover {
+        transform: scale(1.08) rotate(2deg);
+        border-color: rgba(167, 139, 250, 0.6);
+        box-shadow: 0 0 22px rgba(167, 139, 250, 0.45);
     }
 
-    /* Hamburger Ultra-Professionale */
     .hamburger-trigger-btn {
-        background: transparent;
-        border: none;
-        width: 36px;
-        height: 36px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        width: 40px;
+        height: 40px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 10px;
-        transition: background-color 0.2s;
+        border-radius: 12px;
+        transition: all 0.2s;
     }
 
     .hamburger-trigger-btn:hover {
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
     }
 
     .hamburger-icon {
-        width: 18px;
-        height: 12px;
+        width: 20px;
+        height: 14px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -208,7 +245,7 @@
     .hamburger-icon span {
         display: block;
         width: 100%;
-        height: 1.5px;
+        height: 2px;
         background-color: rgba(228, 228, 231, 0.8);
         border-radius: 2px;
         transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease, background-color 0.25s ease;
@@ -216,36 +253,36 @@
     }
 
     .hamburger-trigger-btn.active .hamburger-icon span:nth-child(1) {
-        transform: translateY(5.25px) rotate(45deg);
-        background-color: #818cf8;
+        transform: translateY(6px) rotate(45deg);
+        background-color: #a5b4fc;
     }
     .hamburger-trigger-btn.active .hamburger-icon span:nth-child(2) {
         opacity: 0;
         transform: scaleX(0);
     }
     .hamburger-trigger-btn.active .hamburger-icon span:nth-child(3) {
-        transform: translateY(-5.25px) rotate(-45deg);
-        background-color: #818cf8;
+        transform: translateY(-6px) rotate(-45deg);
+        background-color: #a5b4fc;
     }
 
-    /* Menu Sezioni Allungato */
+    /* Menu Hamburger Dropdown */
     .sections-menu {
         display: none;
         flex-direction: column;
         position: absolute;
         top: calc(100% + 14px);
         right: 0;
-        width: 190px;
-        background: rgba(14, 14, 17, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 14px;
-        padding: 14px 6px; 
-        gap: 6px;          
+        width: 200px;
+        background: rgba(10, 10, 12, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px 8px; 
+        gap: 6px;         
         z-index: 999;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
         opacity: 0;
-        transform: translateY(-8px);
-        transition: opacity 0.2s ease, transform 0.2s ease;
+        transform: translateY(-10px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
     .sections-menu.show {
@@ -256,221 +293,557 @@
 
     .menu-section-item {
         background: transparent;
-        color: rgba(228, 228, 231, 0.65);
+        color: rgba(228, 228, 231, 0.75);
         border: none;
         padding: 10px 14px; 
         text-align: left;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
         font-size: 13px;
-        transition: all 0.15s ease;
+        transition: all 0.2s ease;
     }
 
     .menu-section-item:hover {
         background: rgba(255, 255, 255, 0.04);
         color: #ffffff;
-        transform: translateX(2px);
+        transform: translateX(4px);
     }
     
     .menu-section-item.active-filter {
-        background: rgba(244, 63, 94, 0.1);
-        color: #f43f5e;
+        background: rgba(244, 63, 94, 0.12);
+        color: #fb7185;
     }
 
-    /* Pop-up di Notifica dall'Alto (Top Toast) */
-    .top-toast-notification {
-        position: fixed;
-        top: -70px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(18, 18, 22, 0.95);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 12px 24px;
-        border-radius: 30px;
-        color: #fff;
-        font-size: 13.5px;
-        font-weight: 600;
-        z-index: 100005;
-        box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-        pointer-events: none;
-        transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .top-toast-notification.show {
-        top: 24px;
-    }
-
-    /* Schermata Modale Password */
-    .pwd-modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(8, 8, 10, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        z-index: 99999;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.25s ease;
-    }
-    .pwd-modal-overlay.show { display: flex;
-        opacity: 1; }
-
-    .pwd-modal-card {
-        background: #121215;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 16px;
-        width: 340px;
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
-        transform: scale(0.95);
-        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .pwd-modal-overlay.show .pwd-modal-card { transform: scale(1); }
-
-    .pwd-modal-title { font-size: 15px; font-weight: 700;
-        color: #ffffff; text-align: center; letter-spacing: 0.3px; }
-    
-    .pwd-modal-input {
-        width: 100%;
-        padding: 12px; background: rgba(0, 0, 0, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px;
-        color: #ffffff; font-size: 14px;
-        outline: none; text-align: center;
-    }
-    .pwd-modal-input:focus { border-color: #6366f1; background: rgba(0,0,0,0.4);
-    }
-    
-    .pwd-modal-actions { display: flex; gap: 10px;
-    }
-    .pwd-btn {
-        flex: 1; padding: 10px; border: none;
-        border-radius: 8px; font-weight: 600;
-        font-size: 13px; cursor: pointer; transition: all 0.15s ease;
-    }
-    .pwd-btn-cancel { background: rgba(255, 255, 255, 0.03); color: rgba(228,228,231,0.7); border: 1px solid rgba(255,255,255,0.03);
-    }
-    .pwd-btn-cancel:hover { background: rgba(255, 255, 255, 0.06); color: #fff;
-    }
-    .pwd-btn-confirm { background: #5154ed; color: white; }
-    .pwd-btn-confirm:hover { background: #6366f1;
-    }
-
-    /* Griglia dei Giochi */
+    /* ==========================================================================
+       3. GRIGLIA & SCHEDE GIOCO (GAME CARDS)
+       ========================================================================== */
     .games-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 25px;
-        padding-top: 5px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 28px;
+        padding-top: 8px;
         position: relative;
         z-index: 1;
     }
 
-    /* Card Gioco Studio-Style */
     .game-card {
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.03);
-        border-radius: 14px;
+        background: rgba(18, 18, 24, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 18px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        min-height: 400px;
+        min-height: 420px;
         position: relative;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .game-card:hover {
-        transform: translateY(-4px);
-        background: rgba(255, 255, 255, 0.02);
-        border-color: rgba(99, 102, 241, 0.2);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        transform: translateY(-6px);
+        background: rgba(18, 18, 24, 0.6);
+        border-color: rgba(99, 102, 241, 0.35);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 15px rgba(99, 102, 241, 0.05);
     }
 
-    /* Bottone Cuore Preferiti */
+    /* Cuore Preferiti Sospeso */
     .favorite-heart-btn {
         position: absolute;
-        top: 12px;
-        left: 12px;
+        top: 14px;
+        left: 14px;
         z-index: 10;
-        background: rgba(0, 0, 0, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.6);
-        width: 32px;
-        height: 32px;
+        background: rgba(10, 10, 12, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.5);
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        font-size: 14px;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        transition: all 0.2s ease;
+        font-size: 15px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+    
     .favorite-heart-btn:hover {
-        transform: scale(1.1);
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
+        transform: scale(1.15);
+        background: rgba(244, 63, 94, 0.15);
+        border-color: rgba(244, 63, 94, 0.4);
+        color: #f43f5e;
+    }
+    
+    .favorite-heart-btn.is-fav {
+        color: #f43f5e;
+        background: rgba(244, 63, 94, 0.1);
+        border-color: rgba(244, 63, 94, 0.25);
     }
 
+    /* Copertina */
     .game-cover-wrapper {
-        width: 100%; height: 140px; overflow: hidden;
+        width: 100%; 
+        height: 150px; 
+        overflow: hidden;
         position: relative;
-        background: rgba(0, 0, 0, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        background: rgba(0, 0, 0, 0.4); 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
 
     .game-cover {
-        width: 100%; height: 100%; background-size: 100% 100%;
-        background-repeat: no-repeat; background-position: center;
+        width: 100%; 
+        height: 100%; 
+        background-size: cover;
+        background-repeat: no-repeat; 
+        background-position: center;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .game-card:hover .game-cover {
+        transform: scale(1.05);
     }
 
-    .game-info-block { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; gap: 12px;
+    /* Dettagli Interni */
+    .game-info-block { 
+        padding: 22px; 
+        display: flex; 
+        flex-direction: column; 
+        flex-grow: 1; 
+        gap: 14px; 
     }
-    .game-title { font-size: 15px; font-weight: 700; color: #ffffff; letter-spacing: 0.2px;
+    
+    .game-title { 
+        font-size: 16px; 
+        font-weight: 700; 
+        color: #ffffff; 
+        letter-spacing: 0.3px; 
     }
     
     .game-tags-list {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-top: -4px;
     }
+    
     .game-tag {
         background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 10.5px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 11px;
         font-weight: 600;
         color: rgba(228, 228, 231, 0.7);
     }
 
-    .game-description { font-size: 12px; color: rgba(228, 228, 231, 0.4); line-height: 1.5;
-        flex-grow: 1; }
-
-    .btn-install {
-        display: block; text-align: center;
-        background: rgba(99, 102, 241, 0.08);
-        color: #e0e7ff; border: 1px solid rgba(99, 102, 241, 0.2); padding: 9px 0;
-        border-radius: 8px;
-        font-size: 12.5px; font-weight: 600; text-decoration: none;
-        transition: all 0.2s;
+    .game-description { 
+        font-size: 12.5px; 
+        color: rgba(228, 228, 231, 0.45); 
+        line-height: 1.6; 
+        flex-grow: 1; 
     }
-    .btn-install:hover { background: #5154ed; color: #fff;
-        border-color: #5154ed; }
 
-    @keyframes premiumFadeIn {
-        from { opacity: 0;
-        transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0);
-        }
+    /* Pulsante di Installazione Rapida */
+    .btn-install {
+        display: block; 
+        text-align: center;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%);
+        color: #c7d2fe; 
+        border: 1px solid rgba(99, 102, 241, 0.25); 
+        padding: 11px 0;
+        border-radius: 10px;
+        font-size: 13px; 
+        font-weight: 700; 
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+    }
+    
+    .btn-install:hover { 
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); 
+        color: #ffffff; 
+        border-color: rgba(255, 255, 255, 0.1); 
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
+    }
+
+    /* ==========================================================================
+       4. SCHERMATE MODALI (CMD & PASSWORD)
+       ========================================================================== */
+    /* Toast Notifiche Moderno */
+    .top-toast-notification {
+        position: fixed;
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(15, 15, 20, 0.95);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 14px 28px;
+        border-radius: 40px;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 100005;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.8), 0 0 20px rgba(239, 68, 68, 0.05);
+        pointer-events: none;
+        transition: top 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .top-toast-notification.show {
+        top: 28px;
+    }
+    
+    .top-toast-notification.toast-success {
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.8), 0 0 20px rgba(16, 185, 129, 0.05);
+    }
+
+    /* Modale Password */
+    .pwd-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(6, 6, 8, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .pwd-modal-overlay.show { display: flex; opacity: 1; }
+
+    .pwd-modal-card {
+        background: #101014;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        width: 350px;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.8);
+        transform: scale(0.94);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .pwd-modal-overlay.show .pwd-modal-card { transform: scale(1); }
+    .pwd-modal-title { font-size: 16px; font-weight: 700; color: #ffffff; text-align: center; letter-spacing: 0.3px; }
+    
+    .pwd-modal-input {
+        width: 100%;
+        padding: 13px; 
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08); 
+        border-radius: 10px;
+        color: #ffffff; 
+        font-size: 14px;
+        outline: none; 
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    
+    .pwd-modal-input:focus { 
+        border-color: #6366f1; 
+        background: rgba(0,0,0,0.5); 
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+    }
+    
+    .pwd-modal-actions { display: flex; gap: 12px; }
+    
+    .pwd-btn {
+        flex: 1; 
+        padding: 12px; 
+        border: none;
+        border-radius: 10px; 
+        font-weight: 700;
+        font-size: 13px; 
+        cursor: pointer; 
+        transition: all 0.2s ease;
+    }
+    
+    .pwd-btn-cancel { 
+        background: rgba(255, 255, 255, 0.04); 
+        color: rgba(228,228,231,0.8); 
+        border: 1px solid rgba(255,255,255,0.04); 
+    }
+    
+    .pwd-btn-cancel:hover { 
+        background: rgba(255, 255, 255, 0.08); 
+        color: #fff; 
+        border-color: rgba(255,255,255,0.15);
+    }
+    
+    .pwd-btn-confirm { 
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); 
+        color: white; 
+    }
+    
+    .pwd-btn-confirm:hover { 
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
+        transform: translateY(-1px);
+    }
+
+    /* Modale CMD Ultra-Premium */
+    .cmd-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(6, 6, 8, 0.88);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        z-index: 100000;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .cmd-modal-overlay.show { display: flex; opacity: 1; }
+
+    .cmd-modal-card {
+        background: linear-gradient(145deg, #121217 0%, #0a0a0c 100%);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 28px;
+        width: 460px;
+        max-width: 92%;
+        padding: 36px 32px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        transform: scale(0.92) translateY(12px);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .cmd-modal-overlay.show .cmd-modal-card { transform: scale(1) translateY(0); }
+
+    .cmd-modal-close {
+        position: absolute;
+        top: 24px; right: 24px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+    }
+    
+    .cmd-modal-close:hover {
+        color: #ffffff;
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.35);
+        transform: rotate(90deg);
+    }
+
+    .cmd-modal-title {
+        font-size: 21px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .cmd-modal-description {
+        font-size: 13px;
+        color: rgba(228, 228, 231, 0.65);
+        line-height: 1.6;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 16px 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .cmd-view-panel {
+        display: none;
+        flex-direction: column;
+        gap: 18px;
+        animation: panelFade 0.25s ease forwards;
+        max-height: 450px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+    
+    .cmd-view-panel::-webkit-scrollbar { width: 6px; }
+    .cmd-view-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .cmd-view-panel.active { display: flex; }
+
+    @keyframes panelFade {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cmd-buttons-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* Form add game */
+    .cmd-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        position: relative;
+    }
+    
+    .cmd-form-group label {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: rgba(228, 228, 231, 0.85);
+        padding-left: 4px;
+    }
+    
+    .cmd-form-input {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #ffffff;
+        font-size: 13.5px;
+        outline: none;
+        transition: all 0.25s ease;
+        box-sizing: border-box;
+    }
+    
+    .cmd-form-input:focus {
+        border-color: #10b981;
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+    }
+    
+    .cmd-form-textarea {
+        resize: none;
+        height: 75px;
+    }
+
+    .dynamic-inputs-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    /* Pulsanti CMD */
+    .btn-cmd-action {
+        width: 100%;
+        padding: 14px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        color: #f4f4f5;
+    }
+    
+    .btn-cmd-action span.btn-text {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-cmd-action span.btn-arrow {
+        font-size: 11px;
+        opacity: 0.3;
+        transition: transform 0.25s ease;
+    }
+
+    .btn-cmd-action:hover {
+        transform: translateY(-2px);
+        color: #ffffff;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .btn-cmd-action:hover span.btn-arrow {
+        opacity: 0.8;
+        transform: translateX(4px);
+    }
+
+    /* Temi di colore dei pulsanti CMD */
+    .btn-cmd-add {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.03) 100%);
+        border-color: rgba(16, 185, 129, 0.25);
+    }
+    .btn-cmd-add:hover {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.06) 100%);
+        border-color: rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-cmd-remove {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.03) 100%);
+        border-color: rgba(239, 68, 68, 0.25);
+    }
+    .btn-cmd-remove:hover {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.06) 100%);
+        border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .btn-cmd-edit {
+        background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.03) 100%);
+        border-color: rgba(245, 158, 11, 0.25);
+    }
+    .btn-cmd-edit:hover {
+        background: linear-gradient(90deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.06) 100%);
+        border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    .btn-cmd-remove-edit {
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.03) 100%);
+        border-color: rgba(99, 102, 241, 0.25);
+    }
+    .btn-cmd-remove-edit:hover {
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.06) 100%);
+        border-color: rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-cmd-submit-add {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 700;
+        margin-top: 8px;
+        border: none;
+    }
+    .btn-cmd-submit-add:hover {
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-cmd-cancel {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.08);
+        justify-content: center;
+        margin-top: 8px;
+        font-weight: 600;
+        color: rgba(228, 228, 231, 0.7);
+    }
+    .btn-cmd-cancel:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
     }
 </style>
 
@@ -489,19 +862,18 @@
                 <button class="category-item" onclick="filterCategory('multiplayer', this, 'Multiplayer')">Multiplayer</button>
                 <button class="category-item" onclick="filterCategory('singleplayer', this, 'Singleplayer')">Singleplayer</button>
             </div>
+            <button id="admin-edit-btn" class="category-trigger-btn">🖊️ Edit</button>
         </div>
 
         <div class="search-wrapper" onclick="event.stopPropagation()">
-            <input type="text" id="game-search-input" class="search-input" placeholder="Cerca un titolo..." oninput="filterGames()">
+            <input type="text" id="game-search-input" class="search-input" placeholder="Quale titolo cerchi oggi?" oninput="filterGames()">
             <span class="search-icon">🔍</span>
         </div>
 
         <div class="right-actions-wrapper">
-            <button class="ia-avatar-btn" title="Intelligenza Artificiale" onclick="iaClickAction(event)">
-                <img src="Images/IA.gif" id="ia-image" alt="IA">
-            </button>
+            <button class="ia-avatar-btn" title="Chiedi al tuo Assistente AI" onclick="iaClickAction(event)"></button>
 
-            <button class="hamburger-trigger-btn" id="hamburger-btn" title="Menu Sezioni" onclick="toggleSectionsMenu(event)">
+            <button class="hamburger-trigger-btn" id="hamburger-btn" title="Apri Menu" onclick="toggleSectionsMenu(event)">
                 <div class="hamburger-icon">
                     <span></span>
                     <span></span>
@@ -511,48 +883,168 @@
             
             <div class="sections-menu" id="sections-menu">
                 <button class="menu-section-item" onclick="goHome(event)">🏠 Home</button>
-                <button class="menu-section-item" onclick="changeSection('admin', event)">🔒 Admin</button>
-                <button class="menu-section-item" onclick="changeSection('aisos', event)">🎮 Aisos Games</button>
-                <hr style="border:0; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 6px;">
+                <button class="menu-section-item" onclick="changeSection('admin', event)">🔒 Area Admin</button>
+                <button class="menu-section-item" onclick="changeSection('aisos', event)">🎮 Catalogo Aisos</button>
+                <hr style="border:0; border-top: 1px solid rgba(255,255,255,0.08); margin: 6px 4px;">
                 <button class="menu-section-item" id="menu-fav-toggle" onclick="toggleFavoritesFilter(event)">⭐ Preferiti</button>
             </div>
         </div>
     </div>
 
-    <div class="games-grid">
-        
+    <!-- Griglia dei Giochi -->
+    <div class="games-grid" id="main-games-grid">
+        <!-- MECCHA CHAMELEON -->
         <div class="game-card" data-name="MECCHA CHAMELEON" data-id="game_meccha_chameleon" data-category="azione avventura multiplayer">
-            <button class="favorite-heart-btn" title="Aggiungi ai preferiti" onclick="toggleFavorite('game_meccha_chameleon', 'MECCHA CHAMELEON', event)">❤</button>
-            
+            <button class="favorite-heart-btn is-fav" title="Rimuovi dai preferiti" onclick="toggleFavorite('game_meccha_chameleon', 'MECCHA CHAMELEON', event)">❤</button>
             <div class="game-cover-wrapper">
                 <div class="game-cover" style="background-image: url('https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4704690/163e2a742e5fb8e1f5d1e3a890da98f04ab809d4/header.jpg?t=1782561846');"></div>
             </div>
             <div class="game-info-block">
                 <div class="game-title">MECCHA CHAMELEON</div>
-                
                 <div class="game-tags-list">
                     <span class="game-tag">Azione</span>
                     <span class="game-tag">Avventura</span>
                     <span class="game-tag">Multiplayer</span>
                 </div>
-
                 <div class="game-description">Mimetizzati strategicamente, scatta a tutta velocità e supera prove elettrizzanti in questo frenetico e coloratissimo action-arcade d'élite!</div>
-                
-                <button onclick="if(typeof switchView === 'function') { switchView('games', 'Files/Games/MECCHA CHAMELEON.html'); } else { console.error('switchView non trovata'); }" class="btn-install" style="width: 100%; cursor: pointer; border: 1px solid rgba(99, 102, 241, 0.2);">Installa</button>
+                <button onclick="if(typeof switchView === 'function') { switchView('games', 'Files/Games/MECCHA CHAMELEON.html'); } else { console.error('switchView non trovata'); }" class="btn-install">Installa</button>
             </div>
         </div>
 
+        <!-- BACKROOMS LOST RUNNERS -->
+        <div class="game-card" data-name="Backrooms Lost Runners" data-id="game_backrooms_lost_runners" data-category="horror azione multiplayer">
+            <button class="favorite-heart-btn" title="Aggiungi ai preferiti" onclick="toggleFavorite('game_backrooms_lost_runners', 'Backrooms Lost Runners', event)">❤</button>
+            <div class="game-cover-wrapper">
+                <div class="game-cover" style="background-image: url('https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3072120/dad7d34f3239a360eee16c3763d82d80501937b7/header.jpg?t=1781718736');"></div>
+            </div>
+            <div class="game-info-block">
+                <div class="game-title">Backrooms Lost Runners</div>
+                <div class="game-tags-list">
+                    <span class="game-tag">Horror</span>
+                    <span class="game-tag">Azione</span>
+                    <span class="game-tag">Multiplayer</span>
+                </div>
+                <div class="game-description">Survival horror cooperativo ambientato in spazi liminali. Risolvi enigmi immersivi, inganna le entità e fai attenzione: l'IA reagisce alla tua voce.</div>
+                <button onclick="if(typeof switchView === 'function') { switchView('games', 'Files/Games/BackroomsLostRunners.html'); } else { console.error('switchView non trovata'); }" class="btn-install">Installa</button>
+            </div>
+        </div>
     </div>
 
 </div>
 
+<!-- Schermata Modale Aisos CMD Evoluta -->
+<div class="cmd-modal-overlay" id="aisos-cmd-modal" onclick="closeCmdModal()">
+    <div class="cmd-modal-card" onclick="event.stopPropagation()">
+        <button class="cmd-modal-close" onclick="closeCmdModal()">✕</button>
+        <div class="cmd-modal-title" id="cmd-modal-main-title">🛠️ Hub Aisos CMD</div>
+        <div class="cmd-modal-description" id="cmd-modal-main-desc">
+            Benvenuto nell'hub creato da <strong>acrox</strong> per gestire l'automazione della piattaforma. Seleziona l'azione desiderata! ✨
+        </div>
+        
+        <!-- PANNELLO 1: Menu Principale -->
+        <div class="cmd-view-panel active" id="panel-main-menu">
+            <div class="cmd-buttons-grid">
+                <button class="btn-cmd-action btn-cmd-add" onclick="showAddGameForm()">
+                    <span class="btn-text">🚀 Aggiungi Gioco</span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+                <button class="btn-cmd-action btn-cmd-remove" onclick="console.log('Rimuovi Gioco')">
+                    <span class="btn-text">🗑️ Rimuovi Gioco</span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+                <button class="btn-cmd-action btn-cmd-edit" onclick="console.log('Modifica Gioco')">
+                    <span class="btn-text">📝 Modifica Gioco</span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+                <button class="btn-cmd-action btn-cmd-remove-edit" onclick="console.log('Rimuovi Edit')">
+                    <span class="btn-text">⚡ Rimuovi Modifiche</span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+                <button class="btn-cmd-action btn-cmd-cancel" onclick="closeCmdModal()">
+                    Indietro
+                </button>
+            </div>
+        </div>
+
+        <!-- PANNELLO 2: Step 1 Dettagli Gioco -->
+        <div class="cmd-view-panel" id="panel-add-game">
+            <div class="cmd-form-group">
+                <label for="add-game-title">Nome del Titolo</label>
+                <input type="text" id="add-game-title" class="cmd-form-input" placeholder="Es. Cyberpunk 2077">
+            </div>
+            
+            <div class="cmd-form-group">
+                <label for="add-game-cover">URL Immagine Copertina</label>
+                <input type="url" id="add-game-cover" class="cmd-form-input" placeholder="https://example.com/cover.jpg">
+            </div>
+
+            <div class="cmd-form-group">
+                <label for="add-game-category">Tag Categoria (Spaziati tra loro)</label>
+                <input type="text" id="add-game-category" class="cmd-form-input" placeholder="Es. azione avventura multiplayer">
+            </div>
+
+            <div class="cmd-form-group">
+                <label for="add-game-desc">Breve Descrizione</label>
+                <textarea id="add-game-desc" class="cmd-form-input cmd-form-textarea" placeholder="Descrivi brevemente il titolo..."></textarea>
+            </div>
+
+            <button class="btn-cmd-action btn-cmd-submit-add" onclick="showStepTwoForm()">
+                💾 Prosegui alla Pagina Interna
+            </button>
+            
+            <button class="btn-cmd-action btn-cmd-cancel" onclick="backToMainMenu()">
+                Indietro
+            </button>
+        </div>
+
+        <!-- PANNELLO 3: Step 2 Generazione HTML Pagina Interna -->
+        <div class="cmd-view-panel" id="panel-add-game-step2">
+            <div class="cmd-form-group">
+                <label style="color: #a5b4fc; font-size: 13.5px;">🎯 Gioco selezionato: <span id="step2-title-display" style="color:#fff; font-weight:700;"></span></label>
+            </div>
+
+            <div class="cmd-form-group">
+                <label for="add-html-filename">Nome file HTML (sarà salvato nella cartella giochi)</label>
+                <input type="text" id="add-html-filename" class="cmd-form-input" placeholder="Es. Cyberpunk2077.html">
+            </div>
+
+            <div class="cmd-form-group">
+                <label for="add-html-desc">Recensione / Dettagli Pagina Interna</label>
+                <textarea id="add-html-desc" class="cmd-form-input cmd-form-textarea" placeholder="Inserisci una descrizione dettagliata per la pagina interna del gioco..."></textarea>
+            </div>
+
+            <div class="cmd-form-group">
+                <label for="add-html-img-count">Quante immagini desideri inserire? (Max 15)</label>
+                <input type="number" id="add-html-img-count" class="cmd-form-input" min="0" max="15" value="0" oninput="handleImageInputs(this.value)">
+                <div id="wrapper-img-inputs" class="dynamic-inputs-container" style="display:none; margin-top:6px;"></div>
+            </div>
+
+            <div class="cmd-form-group">
+                <label for="add-html-parts-count">Quante parti/link di download ha il gioco? (Max 15)</label>
+                <input type="number" id="add-html-parts-count" class="cmd-form-input" min="0" max="15" value="0" oninput="handlePartsInputs(this.value)">
+                <div id="wrapper-parts-inputs" class="dynamic-inputs-container" style="display:none; margin-top:6px;"></div>
+            </div>
+
+            <button class="btn-cmd-action btn-cmd-submit-add" style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);" onclick="submitStepTwoReal()">
+                🚀 Salva e Genera Pagina
+            </button>
+            
+            <button class="btn-cmd-action btn-cmd-cancel" onclick="backToStepOne()">
+                Indietro
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modale Password per Admin -->
 <div class="pwd-modal-overlay" id="password-modal" onclick="closePasswordModal()">
     <div class="pwd-modal-card" onclick="event.stopPropagation()">
-        <div class="pwd-modal-title">Autenticazione Amministratore</div>
-        <input type="password" id="admin-password-field" class="pwd-modal-input" placeholder="Password di sicurezza...">
+        <div class="pwd-modal-title">Autenticazione Richiesta</div>
+        <input type="password" id="admin-password-field" class="pwd-modal-input" placeholder="Inserisci password...">
         <div class="pwd-modal-actions">
             <button class="pwd-btn pwd-btn-cancel" onclick="closePasswordModal()">Annulla</button>
-            <button class="pwd-btn pwd-btn-confirm" onclick="verifyAdminPassword()">Conferma</button>
+            <button class="pwd-btn pwd-btn-confirm" onclick="verifyAdminPassword()">Verifica</button>
         </div>
     </div>
 </div>
@@ -560,244 +1052,593 @@
 <div class="top-toast-notification" id="top-toast"></div>
 
 <script>
-    let activeCategory = 'all';
-    let filterOnlyFavorites = false;
+// ==========================================================================
+// FUNZIONALITÀ INTERNE & COMPATIBILITÀ GESTIONE CODICE
+// ==========================================================================
 
-    document.addEventListener('DOMContentLoaded', () => {
-        analizzaPreferitiAlAvvio();
-    });
+let currentNewGameData = {};
 
-    function analizzaPreferitiAlAvvio() {
-        const savedFavorites = JSON.parse(localStorage.getItem('acrox_game_favorites')) || [];
-        document.querySelectorAll('.game-card').forEach(card => {
-            const gameId = card.getAttribute('data-id');
-            const heartBtn = card.querySelector('.favorite-heart-btn');
-            if (heartBtn) {
-                if (savedFavorites.includes(gameId)) {
-                    heartBtn.classList.add('is-fav');
-                } else {
-                    heartBtn.classList.remove('is-fav');
-                }
-            }
-        });
+// Otteniamo in modo sicuro le librerie Node ed Electron (solo se presenti nel contesto dell'app)
+let fs = null;
+let path = null;
+let percorsoFileJson = '';
+
+try {
+    if (window.require) {
+        fs = window.require('fs');
+        path = window.require('path');
+        percorsoFileJson = path.join(__dirname, 'Files', 'Games', 'giochi-salvati.json');
     }
+} catch (e) {
+    console.warn("Librerie Node.js / Electron non disponibili (Siamo nel browser).", e);
+}
 
-    // Torna alla home pulendo i filtri
-    function goHome(event) {
-        event.stopPropagation();
-        filterOnlyFavorites = false;
-        const favToggleBtn = document.getElementById('menu-fav-toggle');
-        if (favToggleBtn) {
-            favToggleBtn.classList.remove('active-filter');
-            favToggleBtn.innerHTML = "⭐ Preferiti";
-        }
-
-        activeCategory = 'all';
-        const triggerBtn = document.getElementById('category-trigger');
-        if (triggerBtn) triggerBtn.innerHTML = `📂 Tutti i giochi <span class="arrow" id="category-arrow">▼</span>`;
-        document.querySelectorAll('.category-item').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.textContent === 'Tutti i giochi') btn.classList.add('active');
-        });
-        if(document.getElementById('game-search-input')) document.getElementById('game-search-input').value = '';
-
-        chiudiSectionsMenu();
-        filterGames();
-        showTopPopup("🏠 Sei tornato alla Home");
-    }
-
-    // Gestione Inserimento/Rimozione Preferiti
-    function toggleFavorite(gameId, gameName, event) {
-        event.stopPropagation();
-        let savedFavorites = JSON.parse(localStorage.getItem('acrox_game_favorites')) || [];
-        const heartBtn = event.currentTarget;
-        let msg = "";
-        if (savedFavorites.includes(gameId)) {
-            savedFavorites = savedFavorites.filter(id => id !== gameId);
-            heartBtn.classList.remove('is-fav');
-            msg = `💔 Hai rimosso "${gameName}" dai preferiti`;
-        } else {
-            savedFavorites.push(gameId);
-            heartBtn.classList.add('is-fav');
-            msg = `💖 Hai aggiunto "${gameName}" ai preferiti`;
-        }
-
-        localStorage.setItem('acrox_game_favorites', JSON.stringify(savedFavorites));
-        showTopPopup(msg);
-        if (filterOnlyFavorites) {
-            filterGames();
-        }
-    }
-
-    function showTopPopup(message) {
-        const topToast = document.getElementById('top-toast');
-        if(topToast) {
-            topToast.innerHTML = message;
-            topToast.classList.add('show');
-            setTimeout(() => { topToast.classList.remove('show'); }, 2500);
-        }
-    }
-
-    function toggleFavoritesFilter(event) {
-        event.stopPropagation();
-        filterOnlyFavorites = !filterOnlyFavorites;
-        const favToggleBtn = document.getElementById('menu-fav-toggle');
-        if (filterOnlyFavorites) {
-            favToggleBtn.classList.add('active-filter');
-            favToggleBtn.innerHTML = "⭐ Mostrando Preferiti";
-        } else {
-            favToggleBtn.classList.remove('active-filter');
-            favToggleBtn.innerHTML = "⭐ Preferiti";
-        }
-
-        chiudiSectionsMenu();
-        filterGames();
-    }
-
-    // Gestione Menu Hamburger
-    function toggleSectionsMenu(event) {
-        event.stopPropagation();
-        chiudiMenu(); 
-        
-        const menu = document.getElementById('sections-menu');
-        const btn = document.getElementById('hamburger-btn');
-        
-        if (menu && menu.classList.contains('show')) {
-            chiudiSectionsMenu();
-        } else if(menu && btn) {
-            btn.classList.add('active'); 
-            menu.style.display = 'flex';
-            setTimeout(() => { menu.classList.add('show'); }, 10);
-        }
-    }
-
-    function chiudiSectionsMenu() {
-        const menu = document.getElementById('sections-menu');
-        const btn = document.getElementById('hamburger-btn');
-        if (btn) btn.classList.remove('active'); 
-        if (menu && menu.classList.contains('show')) {
-            menu.classList.remove('show');
-            setTimeout(() => { menu.style.display = 'none'; }, 180);
-        }
-    }
-
-    function changeSection(sectionName, event) {
-        event.stopPropagation();
-        if (sectionName === 'admin') {
-            chiudiSectionsMenu();
-            openPasswordModal();
+/* Carica i giochi presenti nel file JSON salvato */
+function caricaGiochiDalDatabase() {
+    if (!fs || !path) return;
+    try {
+        if (!fs.existsSync(percorsoFileJson)) {
+            fs.mkdirSync(path.dirname(percorsoFileJson), { recursive: true });
+            fs.writeFileSync(percorsoFileJson, '[]', 'utf8');
             return;
         }
-        console.log("Navigazione su: " + sectionName);
-        chiudiSectionsMenu();
-    }
 
-    function openPasswordModal() {
-        const modal = document.getElementById('password-modal');
-        const input = document.getElementById('admin-password-field');
-        if(modal && input) {
-            input.value = '';
-            modal.style.display = 'flex';
-            setTimeout(() => { modal.classList.add('show'); input.focus(); }, 10);
+        const contenuto = fs.readFileSync(percorsoFileJson, 'utf8');
+        const giochi = JSON.parse(contenuto || '[]');
+        const gamesGrid = document.getElementById('main-games-grid');
+
+        if (!gamesGrid) return;
+
+        giochi.forEach(gioco => {
+            if (document.querySelector(`[data-id="${gioco.id}"]`)) return;
+            iniettaCardNelDom(gioco);
+        });
+    } catch (error) {
+        console.error("Errore nel caricamento del file JSON:", error);
+    }
+}
+
+/* Funzione per iniettare le card dei giochi dinamicamente */
+function iniettaCardNelDom(gioco) {
+    const gamesGrid = document.getElementById('main-games-grid');
+    if (!gamesGrid) return;
+
+    const tagsArray = gioco.category.split(' ');
+    let tagsHTML = '';
+    tagsArray.forEach(tag => {
+        if(tag.trim()) {
+            tagsHTML += `<span class="game-tag">${tag.charAt(0).toUpperCase() + tag.slice(1)}</span> `;
         }
+    });
+
+    const newCard = document.createElement('div');
+    newCard.className = 'game-card';
+    newCard.setAttribute('data-name', gioco.title);
+    newCard.setAttribute('data-id', gioco.id);
+    newCard.setAttribute('data-category', gioco.category.toLowerCase());
+
+    newCard.innerHTML = `
+        <button class="favorite-heart-btn" title="Aggiungi ai preferiti" onclick="toggleFavorite('${gioco.id}', '${gioco.title}', event)">❤</button>
+        <div class="game-cover-wrapper">
+            <div class="game-cover" style="background-image: url('${gioco.cover}');"></div>
+        </div>
+        <div class="game-info-block">
+            <div class="game-title">${gioco.title}</div>
+            <div class="game-tags-list">
+                ${tagsHTML}
+            </div>
+            <div class="game-description">${gioco.desc}</div>
+            <button onclick="if(typeof switchView === 'function') { switchView('games', 'Files/Games/${gioco.filename || '#'}'); } else { console.error('switchView non trovata'); }" class="btn-install">Installa</button>
+        </div>
+    `;
+    gamesGrid.appendChild(newCard);
+}
+
+/* Toast di notifica modernizzato */
+function showSystemToast(message, isSuccess = false) {
+    const toast = document.getElementById('top-toast');
+    if (!toast) return;
+
+    toast.innerHTML = isSuccess ? `🟢 &nbsp; ${message}` : `❌ &nbsp; ${message}`;
+    
+    if (isSuccess) {
+        toast.classList.add('toast-success');
+    } else {
+        toast.classList.remove('toast-success');
     }
 
-    function closePasswordModal() {
-        const modal = document.getElementById('password-modal');
-        if (modal) {
-            modal.classList.remove('show');
-            setTimeout(() => { modal.style.display = 'none'; }, 180);
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
+
+// Modali CMD
+function openCmdModal() {
+    const modal = document.getElementById('aisos-cmd-modal');
+    if (modal) {
+        backToMainMenu();
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+}
+
+function closeCmdModal() {
+    const modal = document.getElementById('aisos-cmd-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 250);
+    }
+}
+
+function showAddGameForm() {
+    document.getElementById('cmd-modal-main-title').innerText = "🚀 Nuovo Gioco (Step 1/2)";
+    document.getElementById('cmd-modal-main-desc').innerText = "Compila le info principali del gioco per creare la scheda nel catalogo principale.";
+    
+    document.getElementById('panel-main-menu').classList.remove('active');
+    document.getElementById('panel-add-game-step2').classList.remove('active');
+    document.getElementById('panel-add-game').classList.add('active');
+    
+    document.getElementById('add-game-title').value = "";
+    document.getElementById('add-game-cover').value = "";
+    document.getElementById('add-game-category').value = "";
+    document.getElementById('add-game-desc').value = "";
+}
+
+function backToMainMenu() {
+    document.getElementById('cmd-modal-main-title').innerText = "Hub Aisos CMD";
+    document.getElementById('cmd-modal-main-desc').innerText = "Benvenuto nell'hub creato da acrox per gestire l'automazione della piattaforma. Seleziona l'azione desiderata! ✨";
+    
+    document.getElementById('panel-add-game').classList.remove('active');
+    document.getElementById('panel-add-game-step2').classList.remove('active');
+    document.getElementById('panel-main-menu').classList.add('active');
+}
+
+function showStepTwoForm() {
+    const title = document.getElementById('add-game-title').value.trim();
+    const cover = document.getElementById('add-game-cover').value.trim();
+    const category = document.getElementById('add-game-category').value.trim();
+    const desc = document.getElementById('add-game-desc').value.trim();
+
+    if(!title || !cover || !category || !desc) {
+        showSystemToast("Ops! Tutti i campi dello Step 1 devono essere compilati.", false);
+        return;
+    }
+
+    const gameId = "game_auto_" + Date.now();
+
+    currentNewGameData = { 
+        id: gameId,
+        title: title, 
+        cover: cover, 
+        category: category, 
+        desc: desc,
+        filename: title.replace(/\s+/g, '') + '.html',
+        internalDescription: desc,
+        images: [],
+        parts: []
+    };
+
+    // Anteprima immediata
+    const cardEsistente = document.querySelector(`[data-id="${gameId}"]`);
+    if (!cardEsistente) {
+        iniettaCardNelDom(currentNewGameData);
+        showSystemToast(`Ottimo! Anteprima "${title}" aggiunta al catalogo!`, true);
+    }
+
+    document.getElementById('step2-title-display').innerText = title;
+    document.getElementById('add-html-filename').value = currentNewGameData.filename;
+    document.getElementById('add-html-desc').value = "";
+    document.getElementById('add-html-img-count').value = "0";
+    document.getElementById('add-html-parts-count').value = "0";
+    document.getElementById('wrapper-img-inputs').innerHTML = "";
+    document.getElementById('wrapper-img-inputs').style.display = "none";
+    document.getElementById('wrapper-parts-inputs').innerHTML = "";
+    document.getElementById('wrapper-parts-inputs').style.display = "none";
+
+    document.getElementById('cmd-modal-main-title').innerText = "📄 Pagina Interna (Step 2/2)";
+    document.getElementById('cmd-modal-main-desc').innerText = "Definisci screenshot e collegamenti per il download della pagina interna dedicata.";
+
+    document.getElementById('panel-add-game').classList.remove('active');
+    document.getElementById('panel-add-game-step2').classList.add('active');
+}
+
+function backToStepOne() {
+    document.getElementById('cmd-modal-main-title').innerText = "🚀 Nuovo Gioco (Step 1/2)";
+    document.getElementById('panel-add-game-step2').classList.remove('active');
+    document.getElementById('panel-add-game').classList.add('active');
+}
+
+function handleImageInputs(val) {
+    let count = Math.min(parseInt(val) || 0, 15);
+    document.getElementById('add-html-img-count').value = count;
+    
+    const wrapper = document.getElementById('wrapper-img-inputs');
+    wrapper.innerHTML = "";
+    
+    if (count <= 0) {
+        wrapper.style.display = "none";
+        return;
+    }
+    
+    wrapper.style.display = "flex";
+    for(let i = 1; i <= count; i++) {
+        const input = document.createElement('input');
+        input.type = "url";
+        input.className = "cmd-form-input dynamic-img-url-field";
+        input.placeholder = `URL Immagine Galleria ${i}`;
+        wrapper.appendChild(input);
+    }
+}
+
+function handlePartsInputs(val) {
+    let count = Math.min(parseInt(val) || 0, 15);
+    document.getElementById('add-html-parts-count').value = count;
+    
+    const wrapper = document.getElementById('wrapper-parts-inputs');
+    wrapper.innerHTML = "";
+    
+    if (count <= 0) {
+        wrapper.style.display = "none";
+        return;
+    }
+    
+    wrapper.style.display = "flex";
+    for(let i = 1; i <= count; i++) {
+        const input = document.createElement('input');
+        input.type = "url";
+        input.className = "cmd-form-input dynamic-part-url-field";
+        input.placeholder = `Link Download Parte ${i}`;
+        wrapper.appendChild(input);
+    }
+}
+
+/* Generazione File e Scrittura */
+function submitStepTwoReal() {
+    if (!fs || !path) {
+        showSystemToast("Impossibile salvare: Accesso al file system non disponibile su browser.", false);
+        return;
+    }
+
+    const filenameInput = document.getElementById('add-html-filename').value.trim();
+    const internalDesc = document.getElementById('add-html-desc').value.trim();
+
+    if(!filenameInput || !internalDesc) {
+        showSystemToast("Fornisci un nome per il file HTML e una descrizione interna.", false);
+        return;
+    }
+
+    const nomeFileHtml = filenameInput.endsWith('.html') ? filenameInput : filenameInput + '.html';
+
+    // Immagini
+    const imgFields = document.querySelectorAll('.dynamic-img-url-field');
+    let imagesArr = [];
+    let emptyImgFound = false;
+    imgFields.forEach(f => { 
+        if(!f.value.trim()) emptyImgFound = true;
+        else imagesArr.push(f.value.trim()); 
+    });
+
+    if(emptyImgFound) {
+        showSystemToast("Ci sono campi immagine vuoti nella galleria.", false);
+        return;
+    }
+
+    // Parti
+    const partFields = document.querySelectorAll('.dynamic-part-url-field');
+    let partsArr = [];
+    let emptyPartFound = false;
+    partFields.forEach(f => { 
+        if(!f.value.trim()) emptyPartFound = true;
+        else partsArr.push(f.value.trim()); 
+    });
+
+    if(emptyPartFound) {
+        showSystemToast("Alcuni link di download inseriti risultano vuoti.", false);
+        return;
+    }
+
+    currentNewGameData.filename = nomeFileHtml;
+    currentNewGameData.internalDescription = internalDesc;
+    currentNewGameData.images = imagesArr;
+    currentNewGameData.parts = partsArr;
+
+    // Generazione slider HTML interno della pagina
+    let slideBoxesHtml = '';
+    let slideDotsHtml = '';
+    if(imagesArr.length > 0) {
+        imagesArr.forEach((url, index) => {
+            slideBoxesHtml += `<div class="slide-img-box"><img class="slide-img" src="${url}" alt="Gameplay ${index + 1}"></div>\n`;
+            slideDotsHtml += `<div class="dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></div>\n`;
+        });
+    } else {
+        slideBoxesHtml = `<div class="slide-img-box"><img class="slide-img" src="${currentNewGameData.cover}" alt="Cover"></div>`;
+        slideDotsHtml = `<div class="dot active" onclick="goToSlide(0)"></div>`;
+    }
+
+    let tagsBadgeHtml = '';
+    const arrayCategorie = currentNewGameData.category.split(' ');
+    arrayCategorie.forEach(cat => {
+        if(cat.trim()) {
+            tagsBadgeHtml += `<span class="sidebar-tag-badge">${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>\n`;
         }
+    });
+
+    let downloadButtonsHtml = '';
+    if(partsArr.length > 0) {
+        partsArr.forEach((url, index) => {
+            const testoPulsante = partsArr.length === 1 ? '📥 Installa il Gioco' : `📥 Scarica Parte ${index + 1}`;
+            downloadButtonsHtml += `
+            <a href="#" class="btn-premium-download" style="margin-top: 8px;" onclick="apriLinkEsterno(event, '${url}')">
+                <span class="btn-icon">📥</span> ${testoPulsante}
+            </a>\n`;
+        });
+    } else {
+        downloadButtonsHtml = `
+        <a href="#" class="btn-premium-download" style="margin-top: 8px;" onclick="event.preventDefault();">
+            <span class="btn-icon">❌</span> Download non disponibile
+        </a>`;
     }
 
-    function verifyAdminPassword() {
-        const passwordInput = document.getElementById('admin-password-field').value;
-        if (passwordInput === "Acrox&Aisos_CMD") {
-            showTopPopup("✅ Accesso Amministratore Consentito!");
-            closePasswordModal();
-        } else {
-            showTopPopup("❌ Password Errata. Accesso Negato.");
-        }
+    // Struttura HTML interna Premium per la pagina del gioco generata
+    const contenutoNuovoHtml = `<style>
+    .game-page-container {
+        width: 100%; max-width: 1300px; margin: 0 auto; padding: 10px 5px;
+        animation: gameDetailFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        display: flex; flex-direction: column; gap: 24px;
     }
-
-    // Tendina Categorie
-    function toggleCategoryMenu(event) {
-        event.stopPropagation();
-        chiudiSectionsMenu(); 
-        
-        const menu = document.getElementById('category-menu');
-        const arrow = document.getElementById('category-arrow');
-        
-        if (menu && menu.classList.contains('show')) {
-            chiudiMenu();
-        } else if(menu) {
-            menu.style.display = 'flex';
-            setTimeout(() => {
-                menu.classList.add('show');
-                if (arrow) arrow.style.transform = 'rotate(180deg)';
-            }, 10);
-        }
+    .game-detail-top-bar {
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(18, 18, 24, 0.55); padding: 16px 28px; border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
     }
-
-    function chiudiMenu() {
-        const menu = document.getElementById('category-menu');
-        const arrow = document.getElementById('category-arrow');
-        if (menu && menu.classList.contains('show')) {
-            menu.classList.remove('show');
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-            setTimeout(() => { menu.style.display = 'none'; }, 180);
-        }
+    .top-bar-left-zone { display: flex; align-items: center; gap: 16px; }
+    .btn-back-to-games {
+        background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06);
+        color: #fff; width: 40px; height: 40px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 13px; transition: all 0.25s ease;
     }
-
-    function filterCategory(category, buttonElement, categoryName) {
-        activeCategory = category;
-        document.querySelectorAll('.category-item').forEach(btn => btn.classList.remove('active'));
-        buttonElement.classList.add('active');
-        
-        const triggerBtn = document.getElementById('category-trigger');
-        if(triggerBtn) triggerBtn.innerHTML = `📂 ${categoryName} <span class="arrow" id="category-arrow">▼</span>`;
-        
-        chiudiMenu();
-        filterGames();
+    .btn-back-to-games:hover {
+        background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); transform: translateX(-2px);
     }
+    .game-detail-title-main {
+        font-size: 24px; font-weight: 800; letter-spacing: -0.3px;
+        background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ia-badge-gif {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: url('Images/IA.gif') no-repeat center; background-size: cover;
+        border: 2px solid rgba(167, 139, 250, 0.4);
+        animation: aiFluxBreathing 4.5s ease-in-out infinite;
+    }
+    @keyframes aiFluxBreathing {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(167, 139, 250, 0.3); }
+        50% { transform: scale(1.08); box-shadow: 0 0 25px rgba(167, 139, 250, 0.6); }
+    }
+    .game-detail-grid { display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+    @media (max-width: 1024px) { .game-detail-grid { grid-template-columns: 1fr; } }
+    .slider-container {
+        position: relative; width: 100%; aspect-ratio: 16 / 9;
+        border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.65); background: #000;
+    }
+    .slider-wrapper { display: flex; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .slide-img-box { width: 100%; height: 100%; flex-shrink: 0; }
+    .slide-img { width: 100%; height: 100%; object-fit: cover; }
+    .slider-arrow {
+        position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; width: 42px; height: 42px;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 13px; transition: all 0.25s;
+    }
+    .slider-arrow:hover { background: #6366f1; border-color: #818cf8; transform: translateY(-50%) scale(1.08); }
+    .arrow-left { left: 20px; } .arrow-right { right: 20px; }
+    .slider-dots {
+        position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+        display: flex; gap: 8px; background: rgba(0, 0, 0, 0.6); padding: 8px 16px;
+        border-radius: 30px; backdrop-filter: blur(8px);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); cursor: pointer; transition: all 0.25s; }
+    .dot.active { background: #6366f1; width: 22px; border-radius: 6px; }
+    .download-card {
+        background: rgba(18, 18, 24, 0.5); border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 24px; overflow: hidden; backdrop-filter: blur(30px);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+    }
+    .sidebar-game-cover { width: 100%; height: 170px; object-fit: cover; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+    .sidebar-body { padding: 26px; display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-title { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.4px; }
+    .sidebar-description { font-size: 13.5px; color: rgba(228, 228, 231, 0.65); line-height: 1.6; }
+    .metadata-grid { display: flex; flex-direction: column; gap: 8px; background: rgba(0, 0, 0, 0.25); padding: 14px; border-radius: 12px; }
+    .metadata-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+    .meta-label { color: rgba(228, 228, 231, 0.4); } .meta-value { color: rgba(228, 228, 231, 0.85); }
+    .sidebar-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sidebar-tag-badge { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(228, 228, 231, 0.7); padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+    .btn-premium-download {
+        display: flex; align-items: center; justify-content: center; gap: 12px;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: white; text-decoration: none; padding: 16px 28px; border-radius: 14px; font-weight: 700; font-size: 14.5px;
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.35); border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer; transition: all 0.3s ease;
+    }
+    .btn-premium-download:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(99, 102, 241, 0.5); }
+    @keyframes gameDetailFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 
-    // Filtraggio unificato globale
-    function filterGames() {
-        const searchInput = document.getElementById('game-search-input');
-        const query = searchInput ? searchInput.value.toLowerCase() : '';
-        const cards = document.querySelectorAll('.game-card');
-        const savedFavorites = JSON.parse(localStorage.getItem('acrox_game_favorites')) || [];
+<div class="game-page-container">
+    <div class="game-detail-top-bar">
+        <div class="top-bar-left-zone">
+            <button class="btn-back-to-games" onclick="tornaAGamesLista(event)" title="Torna alla lista">◀</button>
+            <h1 class="game-detail-title-main">${currentNewGameData.title}</h1>
+        </div>
+        <div class="ia-badge-gif" onclick="avviaInnescoChatIA(event)" style="cursor:pointer;" title="Innesca IA"></div>
+    </div>
 
-        cards.forEach(card => {
-            const gameName = card.getAttribute('data-name').toLowerCase();
-            const gameId = card.getAttribute('data-id');
-            const gameCategories = card.getAttribute('data-category') ? card.getAttribute('data-category').split(' ') : [];
-            
-            const matchesSearch = gameName.includes(query);
-            const matchesCategory = (activeCategory === 'all' || gameCategories.includes(activeCategory));
-            const matchesFavorites = !filterOnlyFavorites || savedFavorites.includes(gameId);
+    <div class="game-detail-grid">
+        <div class="slider-container">
+            <button class="slider-arrow arrow-left" onclick="moveSlide(-1)">◀</button>
+            <button class="slider-arrow arrow-right" onclick="moveSlide(1)">▶</button>
+            <div class="slider-wrapper" id="sliderWrapper">
+                ${slideBoxesHtml}
+            </div>
+            <div class="slider-dots" id="sliderDots">
+                ${slideDotsHtml}
+            </div>
+        </div>
 
-            if (matchesSearch && matchesCategory && matchesFavorites) {
-                card.style.display = "flex";
+        <div class="download-card">
+            <img class="sidebar-game-cover" src="${currentNewGameData.cover}">
+            <div class="sidebar-body">
+                <div class="sidebar-title">${currentNewGameData.title}</div>
+                <p class="sidebar-description">${currentNewGameData.internalDescription}</p>
+                <div class="metadata-grid">
+                    <div class="metadata-row"><span class="meta-label">Editore</span><span class="meta-value" style="color:#a5b4fc;">Aisos Games</span></div>
+                    <div class="metadata-row"><span class="meta-label">Stato</span><span class="meta-value" style="color: #10b981;">Disponibile</span></div>
+                </div>
+                <div class="sidebar-tags">${tagsBadgeHtml}</div>
+                ${downloadButtonsHtml}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentSlideIndex = 0;
+    const totalSlides = ${imagesArr.length || 1};
+
+    function apriLinkEsterno(event, url) {
+        if (event) event.preventDefault();
+        try {
+            const electron = window.require ? window.require('electron') : null;
+            if (electron && electron.shell) {
+                electron.shell.openExternal(url);
             } else {
-                card.style.display = "none";
+                window.open(url, '_blank');
             }
+        } catch (e) {
+            window.open(url, '_blank');
+        }
+    }
+
+    function updateSlider() {
+        const wrapper = document.getElementById('sliderWrapper');
+        const dots = document.querySelectorAll('.dot');
+        if(wrapper) wrapper.style.transform = \`translateX(-\${currentSlideIndex * 100}%)\`;
+        dots.forEach((dot, index) => {
+            if(index === currentSlideIndex) dot.classList.add('active');
+            else dot.classList.remove('active');
         });
     }
 
-    function iaClickAction(event) {
-        event.stopPropagation();
-        console.log("IA Core Attiva.");
+    function moveSlide(direction) {
+        currentSlideIndex += direction;
+        if (currentSlideIndex >= totalSlides) currentSlideIndex = 0;
+        else if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1;
+        updateSlider();
     }
 
-    window.addEventListener('click', () => {
-        chiudiMenu();
-        chiudiSectionsMenu();
-    });
+    function goToSlide(index) {
+        currentSlideIndex = index;
+        updateSlider();
+    }
 
-    document.addEventListener('keydown', function(e) {
-        if (e.target && e.target.id === 'admin-password-field' && e.key === 'Enter') {
-            verifyAdminPassword();
+    function tornaAGamesLista(event) {
+        if (event) event.stopPropagation();
+        if (typeof switchView === 'function') {
+            switchView('games', 'Files/Games/games_7.txt');
         }
-    });
+    }
+
+    function avviaInnescoChatIA(event) {
+        if (event) event.stopPropagation();
+        const activeChatBox = document.getElementById('ai-chat-box');
+        if (activeChatBox) {
+            activeChatBox.style.display = (activeChatBox.style.display === 'none' || activeChatBox.style.display === '') ? 'flex' : 'none';
+        }
+    }
+<\/script>`;
+
+    const percorsoNuovoHtml = path.join(__dirname, 'Files', 'Games', nomeFileHtml);
+
+    try {
+        fs.writeFileSync(percorsoNuovoHtml, contenutoNuovoHtml, 'utf8');
+
+        let databaseGiochi = [];
+        if (fs.existsSync(percorsoFileJson)) {
+            const contenuto = fs.readFileSync(percorsoFileJson, 'utf8');
+            databaseGiochi = JSON.parse(contenuto || '[]');
+        }
+
+        databaseGiochi.push(currentNewGameData);
+        fs.writeFileSync(percorsoFileJson, JSON.stringify(databaseGiochi, null, 2), 'utf8');
+
+        showSystemToast(`Installazione completata per "${nomeFileHtml}"!`, true);
+        
+        const cardNelDom = document.querySelector(`[data-id="${currentNewGameData.id}"]`);
+        if (cardNelDom) {
+            const btnInstall = cardNelDom.querySelector('.btn-install');
+            if (btnInstall) {
+                btnInstall.setAttribute('onclick', `if(typeof switchView === 'function') { switchView('games', 'Files/Games/${nomeFileHtml}'); } else { console.error('switchView non trovata'); }`);
+            }
+        }
+
+        closeCmdModal();
+    } catch (error) {
+        console.error("Errore di scrittura:", error);
+        showSystemToast("Impossibile salvare il file per permessi locali.", false);
+    }
+}
+
+// Verifica Autenticazione Admin
+function checkAdminButton() {
+    if (localStorage.getItem('isAdminAuthenticated') === 'true') {
+        const categoryWrapper = document.querySelector('.category-dropdown-wrapper');
+        if (categoryWrapper) {
+            const oldBtn = document.getElementById('admin-edit-btn');
+            if (oldBtn) oldBtn.remove();
+
+            const editBtn = document.createElement('button');
+            editBtn.id = 'admin-edit-btn';
+            editBtn.className = 'category-trigger-btn';
+            editBtn.innerHTML = '🖊️ Edit';
+            editBtn.onclick = function(e) {
+                e.stopPropagation();
+                openCmdModal();
+            };
+            categoryWrapper.appendChild(editBtn);
+        }
+    }
+}
+
+// Avvio Inizializzazioni al Caricamento
+checkAdminButton();
+
+function inizializzaSezioneGiochi() {
+    if (typeof window.caricaGiochiSalvati === 'function') {
+        window.caricaGiochiSalvati();
+    } else {
+        setTimeout(inizializzaSezioneGiochi, 150);
+    }
+}
+inizializzaSezioneGiochi();
+
+// Salva l'HTML Dinamico della Grid con salvataggio sicuro Electron
+setTimeout(() => {
+    const wrapper = document.getElementById('main-content-wrapper') || document.body;
+    const interoHtmlDaSalvare = wrapper.innerHTML;
+
+    try {
+        if (window.require) {
+            const { ipcRenderer } = window.require('electron');
+            if (ipcRenderer) {
+                ipcRenderer.send('salva-in-games-txt', interoHtmlDaSalvare);
+            }
+        }
+    } catch(e) {
+        console.warn("Salvataggio persistente Electron non disponibile.");
+    }
+}, 1200);
 </script>

@@ -1,9 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <meta charset="UTF-8");>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACROX - Player Musicale</title>
+    <!-- Font Fredoka coordinato con il resto del launcher -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="JavaScript/Musica/Musica.js" defer></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #1e1f22 0%, #111214 100%);
+            color: white;
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Nome del Launcher in alto */
+        .launcher-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        /* Container della Copertina */
+        .cover-container {
+            width: 200px;
+            height: 200px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .cover-container:hover {
+            transform: scale(1.03);
+        }
+
+        #ui-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #2b2d31;
+        }
+
+        /* Informazioni del brano */
+        .track-info {
+            max-width: 280px;
+        }
+
+        #ui-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playing-status {
+            font-size: 12px;
+            font-weight: 600;
+            color: #57f287;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body>
+
+    <!-- Nome del Launcher -->
+    <div class="launcher-title">Acrox Player</div>
+
+    <!-- Copertina del Brano -->
+    <div class="cover-container">
+        <img id="ui-cover" src="https://placehold.co/150x150/ffffff/000000?text=Audio" alt="Copertina">
+    </div>
+
+    <!-- Info del Brano -->
+    <div class="track-info">
+        <h2 id="ui-title">Nessun brano</h2>
+        <div class="playing-status" id="ui-status">In attesa...</div>
+    </div>
+
 </body>
 </html>

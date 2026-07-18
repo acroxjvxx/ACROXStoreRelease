@@ -1,0 +1,33 @@
+[
+  {
+    "id": "1",
+    "titolo": "Super Mario Odyssey",
+    "piattaforma": "Nintendo Switch",
+    "genere": "Platform",
+    "immagine": "https://via.placeholder.com/150",
+    "note": "Gioco di test per verificare il caricamento del database."
+  },
+  {
+    "id": "2",
+    "titolo": "The Legend of Zelda: Tears of the Kingdom",
+    "piattaforma": "Nintendo Switch",
+    "genere": "Avventura",
+    "immagine": "https://via.placeholder.com/150",
+    "note": "Secondo gioco di test."
+  },
+  {
+    "id": "game_auto_1783280800565",
+    "title": "wdda",
+    "cover": "wdasd",
+    "category": "wdas",
+    "desc": "dwasdw",
+    "filename": "wdda.html",
+    "internalDescription": "wdasd",
+    "images": [
+      "dad"
+    ],
+    "parts": [
+      "dasdw"
+    ]
+  }
+]
